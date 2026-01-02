@@ -8,33 +8,46 @@ from django.utils import timezone
 
 
 class CertificateTemplate(models.Model):
-    """
-    قالب شهادة (اختياري الآن، مهم لاحقًا للطباعة والهوية)
-    """
-    name = models.CharField(max_length=120)
-    region = models.ForeignKey("regions.Region", on_delete=models.SET_NULL, null=True, blank=True, related_name="certificate_templates")
-    is_active = models.BooleanField(default=True)
+    name = models.CharField(max_length=120, verbose_name="اسم القالب")
+    region = models.ForeignKey(
+        "regions.Region",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="certificate_templates",
+        verbose_name="المنطقة (اختياري)",
+    )
+    is_active = models.BooleanField(default=True, verbose_name="نشط")
 
-    created_at = models.DateTimeField(auto_now_add=True)
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="تاريخ الإنشاء")
+
+    class Meta:
+        verbose_name = "قالب شهادة"
+        verbose_name_plural = "قوالب الشهادات"
 
     def __str__(self):
         return self.name
 
 
 class Certificate(models.Model):
-    """
-    شهادة مرتبطة بتسجيل (Enrollment) — إصدار تلقائي بعد تأكيد الحضور.
-    """
     enrollment = models.OneToOneField(
         "courses.Enrollment",
         on_delete=models.CASCADE,
         related_name="certificate",
+        verbose_name="تسجيل الدورة",
     )
 
-    template = models.ForeignKey(CertificateTemplate, on_delete=models.SET_NULL, null=True, blank=True, related_name="certificates")
+    template = models.ForeignKey(
+        CertificateTemplate,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="certificates",
+        verbose_name="القالب (اختياري)",
+    )
 
-    issued_at = models.DateTimeField(default=timezone.now)
-    serial_number = models.CharField(max_length=40, unique=True, db_index=True)
+    issued_at = models.DateTimeField(default=timezone.now, verbose_name="تاريخ الإصدار")
+    serial_number = models.CharField(max_length=40, unique=True, db_index=True, verbose_name="رقم تسلسلي")
 
     issued_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
@@ -42,34 +55,42 @@ class Certificate(models.Model):
         null=True,
         blank=True,
         related_name="issued_certificates",
+        verbose_name="أُصدرت بواسطة (اختياري)",
     )
 
-    created_at = models.DateTimeField(auto_now_add=True)
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="تاريخ الإنشاء")
+
+    class Meta:
+        verbose_name = "شهادة"
+        verbose_name_plural = "الشهادات"
 
     @staticmethod
     def generate_serial() -> str:
         return secrets.token_urlsafe(16)
 
     def __str__(self):
-        return f"Certificate {self.serial_number}"
+        return f"شهادة {self.serial_number}"
 
 
 class CertificateVerification(models.Model):
-    """
-    رمز تحقق عام (QR/Token) للتحقق من صحة الشهادة
-    """
     certificate = models.OneToOneField(
         Certificate,
         on_delete=models.CASCADE,
         related_name="verification",
+        verbose_name="الشهادة",
     )
-    token = models.CharField(max_length=64, unique=True, db_index=True)
-    public_lookup_enabled = models.BooleanField(default=True)
-    created_at = models.DateTimeField(auto_now_add=True)
+    token = models.CharField(max_length=64, unique=True, db_index=True, verbose_name="رمز التحقق")
+    public_lookup_enabled = models.BooleanField(default=True, verbose_name="إتاحة التحقق العام")
+
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="تاريخ الإنشاء")
+
+    class Meta:
+        verbose_name = "تحقق شهادة"
+        verbose_name_plural = "التحقق من الشهادات"
 
     @staticmethod
     def generate_token() -> str:
         return secrets.token_urlsafe(24)
 
     def __str__(self):
-        return f"Verify {self.certificate.serial_number}"
+        return f"تحقق لـ {self.certificate.serial_number}"

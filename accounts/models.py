@@ -3,7 +3,6 @@ from __future__ import annotations
 import secrets
 from datetime import timedelta
 
-from django.conf import settings
 from django.contrib.auth.models import AbstractUser, BaseUserManager
 from django.core.validators import RegexValidator
 from django.db import models
@@ -15,7 +14,7 @@ class UserManager(BaseUserManager):
 
     def _create_user(self, email: str, password: str | None, **extra_fields):
         if not email:
-            raise ValueError("Email is required")
+            raise ValueError("البريد الإلكتروني مطلوب")
         email = self.normalize_email(email).lower()
         user = self.model(email=email, **extra_fields)
         if password:
@@ -35,9 +34,9 @@ class UserManager(BaseUserManager):
         extra_fields.setdefault("is_superuser", True)
         extra_fields.setdefault("is_active", True)
         if extra_fields.get("is_staff") is not True:
-            raise ValueError("Superuser must have is_staff=True.")
+            raise ValueError("يجب أن يكون is_staff=True للمشرف العام.")
         if extra_fields.get("is_superuser") is not True:
-            raise ValueError("Superuser must have is_superuser=True.")
+            raise ValueError("يجب أن يكون is_superuser=True للمشرف العام.")
         return self._create_user(email, password, **extra_fields)
 
 
@@ -52,34 +51,51 @@ class UserRole(models.TextChoices):
 
 class User(AbstractUser):
     """
-    Custom user:
-    - Uses email as the login identifier
-    - Can be scoped to: region / org_branch / individual
+    مستخدم مخصص:
+    - يعتمد البريد الإلكتروني كمعرّف دخول
+    - يمكن تقييده بنطاق: منطقة / فرع جهة / فرد
     """
 
-    username = models.CharField(max_length=150, blank=True, null=True)  # لا نعتمد عليه للدخول
-    email = models.EmailField(unique=True)
+    username = models.CharField(
+        max_length=150,
+        blank=True,
+        null=True,
+        verbose_name="اسم المستخدم",
+        help_text="اختياري (لا نعتمد عليه للدخول).",
+    )
+
+    email = models.EmailField(
+        unique=True,
+        verbose_name="البريد الإلكتروني",
+    )
 
     role = models.CharField(
         max_length=32,
         choices=UserRole.choices,
         default=UserRole.INDIVIDUAL,
         db_index=True,
+        verbose_name="الدور",
     )
 
     phone_validator = RegexValidator(
         regex=r"^\+?\d{8,15}$",
         message="رقم الهاتف يجب أن يكون بصيغة دولية مثل +9665xxxxxxxx",
     )
-    phone = models.CharField(max_length=20, blank=True, validators=[phone_validator])
+    phone = models.CharField(
+        max_length=20,
+        blank=True,
+        validators=[phone_validator],
+        verbose_name="رقم الجوال",
+    )
 
-    # نطاق المستخدم (Scope) — روابط اختيارية لتحديد ماذا يرى
+    # نطاق المستخدم (Scope)
     region = models.ForeignKey(
         "regions.Region",
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
         related_name="users",
+        verbose_name="المنطقة",
     )
     org_branch = models.ForeignKey(
         "organizations.OrganizationBranch",
@@ -87,6 +103,7 @@ class User(AbstractUser):
         null=True,
         blank=True,
         related_name="users",
+        verbose_name="فرع الجهة",
     )
     individual = models.OneToOneField(
         "individuals.Individual",
@@ -94,16 +111,29 @@ class User(AbstractUser):
         null=True,
         blank=True,
         related_name="user_account",
+        verbose_name="ملف الفرد",
     )
 
-    # تعقب
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
+    created_at = models.DateTimeField(
+        auto_now_add=True,
+        verbose_name="تاريخ الإنشاء",
+    )
+    updated_at = models.DateTimeField(
+        auto_now=True,
+        verbose_name="تاريخ آخر تحديث",
+    )
 
     USERNAME_FIELD = "email"
-    REQUIRED_FIELDS = []  # لا نطلب username
+    REQUIRED_FIELDS = []
 
     objects = UserManager()
+
+    class Meta:
+        verbose_name = "مستخدم"
+        verbose_name_plural = "المستخدمون"
+        indexes = [
+            models.Index(fields=["role"]),
+        ]
 
     def __str__(self):
         return f"{self.email} ({self.get_role_display()})"
@@ -111,24 +141,50 @@ class User(AbstractUser):
 
 class EmailOTP(models.Model):
     """
-    OTP via email for login/verification.
+    رمز تحقق (OTP) عبر البريد للتسجيل/التفعيل/استعادة كلمة المرور.
     """
+
     PURPOSE_CHOICES = (
         ("login", "تسجيل الدخول"),
         ("verify_email", "تفعيل البريد"),
         ("reset_password", "استعادة كلمة المرور"),
     )
 
-    email = models.EmailField(db_index=True)
-    purpose = models.CharField(max_length=20, choices=PURPOSE_CHOICES, default="login")
-    code = models.CharField(max_length=10, db_index=True)
-    expires_at = models.DateTimeField(db_index=True)
-    is_used = models.BooleanField(default=False)
-    attempts = models.PositiveIntegerField(default=0)
-
-    created_at = models.DateTimeField(auto_now_add=True)
+    email = models.EmailField(
+        db_index=True,
+        verbose_name="البريد الإلكتروني",
+    )
+    purpose = models.CharField(
+        max_length=20,
+        choices=PURPOSE_CHOICES,
+        default="login",
+        verbose_name="الغرض",
+    )
+    code = models.CharField(
+        max_length=10,
+        db_index=True,
+        verbose_name="الرمز",
+    )
+    expires_at = models.DateTimeField(
+        db_index=True,
+        verbose_name="ينتهي في",
+    )
+    is_used = models.BooleanField(
+        default=False,
+        verbose_name="تم استخدامه",
+    )
+    attempts = models.PositiveIntegerField(
+        default=0,
+        verbose_name="عدد المحاولات",
+    )
+    created_at = models.DateTimeField(
+        auto_now_add=True,
+        verbose_name="تاريخ الإنشاء",
+    )
 
     class Meta:
+        verbose_name = "رمز تحقق عبر البريد"
+        verbose_name_plural = "رموز التحقق عبر البريد"
         indexes = [
             models.Index(fields=["email", "purpose", "is_used"]),
             models.Index(fields=["expires_at"]),
@@ -136,7 +192,6 @@ class EmailOTP(models.Model):
 
     @staticmethod
     def generate_code(length: int = 6) -> str:
-        # كود رقمي بسيط
         digits = "0123456789"
         return "".join(secrets.choice(digits) for _ in range(length))
 

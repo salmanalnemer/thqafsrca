@@ -11,24 +11,28 @@ class ConfirmationMethod(models.TextChoices):
 
 
 class AttendanceConfirmation(models.Model):
-    """
-    حسب قراركم: بعد انتهاء الدورة، المستفيد يؤكد الحضور
-    ثم تُصدر الشهادة تلقائيًا.
-    """
     enrollment = models.OneToOneField(
         "courses.Enrollment",
         on_delete=models.CASCADE,
         related_name="attendance_confirmation",
+        verbose_name="تسجيل الدورة",
     )
 
-    method = models.CharField(max_length=20, choices=ConfirmationMethod.choices, default=ConfirmationMethod.SELF_CONFIRM)
-    confirmed_at = models.DateTimeField(default=timezone.now)
-    note = models.CharField(max_length=255, blank=True)
+    method = models.CharField(
+        max_length=20,
+        choices=ConfirmationMethod.choices,
+        default=ConfirmationMethod.SELF_CONFIRM,
+        verbose_name="طريقة التأكيد",
+    )
+    confirmed_at = models.DateTimeField(default=timezone.now, verbose_name="تاريخ التأكيد")
+    note = models.CharField(max_length=255, blank=True, verbose_name="ملاحظة")
+    confirmation_code = models.CharField(max_length=50, blank=True, db_index=True, verbose_name="رمز التأكيد (اختياري)")
 
-    # لو قررتم لاحقًا إضافة رمز حضور/QR
-    confirmation_code = models.CharField(max_length=50, blank=True, db_index=True)
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="تاريخ الإنشاء")
 
-    created_at = models.DateTimeField(auto_now_add=True)
+    class Meta:
+        verbose_name = "تأكيد حضور"
+        verbose_name_plural = "تأكيدات الحضور"
 
     def __str__(self):
-        return f"Attendance for {self.enrollment}"
+        return f"تأكيد حضور لـ {self.enrollment}"
