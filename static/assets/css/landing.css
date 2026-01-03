@@ -1,0 +1,270 @@
+/* =========================================================
+   landing.css - Landing page layout
+   - Hero: 2 columns (Title | Cards)
+   - Cards: 2 cards side-by-side on desktop, stacked on mobile
+   ========================================================= */
+
+.thqafNajizHero{
+  padding: 26px 0 18px;
+  background: #ffffff;
+}
+
+/* ✅ عمودين */
+.heroGrid{
+  display: grid;
+  grid-template-columns: 1.05fr .95fr;
+  gap: 22px;
+  align-items: start;
+}
+
+/* ---------- Title column ---------- */
+.heroTitle{
+  padding: 18px 0;
+}
+
+.heroTitle h1{
+  margin: 0 0 8px;
+  font-size: 34px;
+  line-height: 1.2;
+  font-weight: 1000;
+  color: #0b1220;
+}
+
+.heroTitle h2{
+  margin: 0 0 12px;
+  font-size: 18px;
+  line-height: 1.5;
+  font-weight: 1000;
+  color: #0b2a4a;
+}
+
+.heroLead{
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.85;
+  font-weight: 900;
+  color: #475569;
+  max-width: 64ch;
+}
+
+/* ---------- Cards column ---------- */
+.cardsRail{
+  display: grid;
+  grid-template-columns: 1fr 1fr;  /* ✅ الكرتين جنب بعض */
+  gap: 14px;
+}
+
+/* Card */
+.nCard{
+  border-radius: 22px;
+  overflow: hidden;
+  border: 1px solid #e5e7eb;
+  background: linear-gradient(180deg, #ffffff, #f7f9fc);
+  box-shadow: 0 18px 45px rgba(2, 8, 23, .10);
+}
+
+/* Head */
+.nHead{
+  padding: 14px 14px 0;
+}
+
+.nBrand{
+  display:flex;
+  align-items:center;
+  gap: 10px;
+}
+
+.nTick{
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #b58a2a;
+  box-shadow: 0 0 0 4px rgba(181,138,42,.16);
+}
+
+.nSub{
+  font-size: 12.5px;
+  font-weight: 1000;
+  color: #0b2a4a;
+}
+
+/* Body */
+.nBody{
+  padding: 12px 14px 14px;
+}
+
+.nBody h3{
+  margin: 6px 0 6px;
+  font-size: 18px;
+  font-weight: 1000;
+  color: #0b1220;
+}
+
+.nBody p{
+  margin: 0 0 12px;
+  font-size: 13.5px;
+  font-weight: 900;
+  color: #475569;
+  line-height: 1.7;
+  min-height: 46px; /* يحافظ على تساوي الكرتين */
+}
+
+.illuWrap{
+  border-radius: 18px;
+  border: 1px solid rgba(11,42,74,.10);
+  background: rgba(11,42,74,.04);
+  height: 120px;
+  overflow: hidden;
+  margin-bottom: 12px;
+}
+
+/* صور وهمية (خلفيات) */
+.card-img{
+  width: 100%;
+  height: 100%;
+  background-size: cover;
+  background-position: center;
+}
+
+/* تقدر تستبدلها بصور حقيقية */
+.img-people{
+  background-image: radial-gradient(circle at 20% 20%, rgba(181,138,42,.22), transparent 55%),
+                    linear-gradient(135deg, rgba(11,42,74,.18), rgba(11,42,74,.04));
+}
+.img-gov{
+  background-image: radial-gradient(circle at 80% 30%, rgba(181,138,42,.22), transparent 55%),
+                    linear-gradient(135deg, rgba(11,42,74,.18), rgba(11,42,74,.04));
+}
+
+/* Actions */
+.nActions{
+  display:flex;
+  justify-content:flex-start;
+}
+
+.nBtn{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap: 10px;
+  height: 44px;
+  padding: 0 14px;
+  border-radius: 14px;
+  border: 1px solid rgba(11,42,74,.14);
+  background: #ffffff;
+  font-weight: 1000;
+  font-size: 14px;
+  color: #0b2a4a;
+  transition: transform .15s ease, box-shadow .15s ease, background .15s ease;
+}
+
+.nBtn.primary{
+  background: linear-gradient(90deg, #0b2a4a, #103a63);
+  color: #fff;
+  border-color: rgba(255,255,255,.12);
+}
+
+.nBtn:hover{
+  transform: translateY(-1px);
+  box-shadow: 0 18px 35px rgba(2,8,23,.14);
+}
+
+.arr{
+  font-weight: 1000;
+}
+
+/* ---------- Stats ---------- */
+.stats{
+  padding: 18px 0 12px;
+  background: #fff;
+}
+
+.statsGrid{
+  display:grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+
+.stat{
+  border: 1px solid #e5e7eb;
+  background: #ffffff;
+  border-radius: 18px;
+  padding: 14px;
+  box-shadow: 0 12px 26px rgba(2,8,23,.06);
+}
+
+.stat b{
+  display:block;
+  font-size: 22px;
+  font-weight: 1000;
+  color: #0b2a4a;
+  margin-bottom: 4px;
+}
+
+.stat span{
+  display:block;
+  font-size: 13px;
+  font-weight: 900;
+  color: #475569;
+}
+
+/* ---------- FAQ ---------- */
+.faq{
+  padding: 14px 0 26px;
+  background: #fff;
+}
+
+.faqBox{
+  border: 1px solid #e5e7eb;
+  border-radius: 22px;
+  background: #ffffff;
+  box-shadow: 0 12px 26px rgba(2,8,23,.06);
+  padding: 16px;
+}
+
+.faqBox h3{
+  margin: 0 0 10px;
+  font-size: 16px;
+  font-weight: 1000;
+  color: #0b1220;
+}
+
+.faqBox details{
+  border-top: 1px solid #edf1f7;
+  padding: 10px 0;
+}
+
+.faqBox details:first-of-type{
+  border-top: 0;
+}
+
+.faqBox summary{
+  cursor:pointer;
+  font-weight: 1000;
+  color: #0b2a4a;
+  font-size: 14px;
+}
+
+.faqBox p{
+  margin: 8px 0 0;
+  color: #475569;
+  font-weight: 900;
+  font-size: 13.5px;
+  line-height: 1.75;
+}
+
+/* =========================================================
+   Responsive
+========================================================= */
+@media (max-width: 1000px){
+  .heroGrid{
+    grid-template-columns: 1fr; /* ✅ تحت بعض */
+  }
+  .cardsRail{
+    grid-template-columns: 1fr; /* ✅ الكرتين تحت بعض بالجوال */
+  }
+  .statsGrid{
+    grid-template-columns: 1fr;
+  }
+  .heroTitle h1{ font-size: 30px; }
+}

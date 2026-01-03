@@ -1,0 +1,419 @@
+{% load static %}
+
+<section class="hero">
+  <div class="wrap hero-grid">
+
+    <!-- النص -->
+    <div class="hero-copy">
+      <span class="badge">منصة ثقف • إدارة التدريب والتأهيل</span>
+      <h1 class="hero-title">
+        بوابتك لتنظيم الدورات
+        <span class="highlight">بشكل احترافي</span>
+      </h1>
+      <p class="hero-desc">
+        سجّل، استعرض الدورات، تابع حضورك، واطّلع على تفاصيل البرامج التدريبية في مكان واحد.
+      </p>
+
+      <div class="hero-actions">
+        <a class="cta primary" href="/courses/">استعراض الدورات</a>
+        <a class="cta ghost" href="/accounts/login/">تسجيل الدخول</a>
+      </div>
+
+      <div class="hero-stats">
+        <div class="stat">
+          <b>+120</b>
+          <span>دورة تدريبية</span>
+        </div>
+        <div class="stat">
+          <b>+25</b>
+          <span>مسار تأهيلي</span>
+        </div>
+        <div class="stat">
+          <b>24/7</b>
+          <span>وصول للمنصة</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- الشكل/الصورة -->
+    <div class="hero-card" aria-hidden="true">
+      <div class="card-top">
+        <div class="logo-mini">
+          <img src="{% static 'assets/img/logothqaf.png' %}" alt="">
+        </div>
+        <div class="chip">THQAF</div>
+      </div>
+
+      <div class="card-body">
+        <div class="kpi">
+          <div class="kpi-row">
+            <span>الدورات المتاحة</span>
+            <b>48</b>
+          </div>
+          <div class="bar"><i style="width:78%"></i></div>
+        </div>
+
+        <div class="kpi">
+          <div class="kpi-row">
+            <span>المقاعد المحجوزة</span>
+            <b>312</b>
+          </div>
+          <div class="bar"><i style="width:62%"></i></div>
+        </div>
+
+        <div class="kpi">
+          <div class="kpi-row">
+            <span>طلبات التدريب</span>
+            <b>16</b>
+          </div>
+          <div class="bar"><i style="width:35%"></i></div>
+        </div>
+
+        <div class="card-note">
+          لوحة هبوط جاهزة للربط مع بياناتك لاحقاً (Django context).
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<section class="features">
+  <div class="wrap">
+    <h2 class="sec-title">ماذا تقدم منصة ثقف؟</h2>
+    <p class="sec-desc">واجهة حديثة + إدارة واضحة للدورات والتسجيل والمتابعة.</p>
+
+    <div class="feat-grid">
+      <article class="feat">
+        <div class="icon">✓</div>
+        <h3>إدارة الدورات</h3>
+        <p>إنشاء وتنظيم الدورات، الفئات، والمواعيد بشكل مرتب.</p>
+      </article>
+
+      <article class="feat">
+        <div class="icon">⚡</div>
+        <h3>تسجيل سريع</h3>
+        <p>تجربة تسجيل سهلة وواضحة للمستفيدين.</p>
+      </article>
+
+      <article class="feat">
+        <div class="icon">🔒</div>
+        <h3>أمان وموثوقية</h3>
+        <p>قابلية إضافة CSRF / جلسات آمنة / صلاحيات حسب الدور.</p>
+      </article>
+
+      <article class="feat">
+        <div class="icon">📊</div>
+        <h3>تقارير وملخصات</h3>
+        <p>عرض إحصائيات مبسطة ويمكن تطويرها إلى داشبورد كامل.</p>
+      </article>
+    </div>
+  </div>
+</section>
+
+<section class="cta-strip">
+  <div class="wrap strip">
+    <div>
+      <h3>جاهز تبدأ؟</h3>
+      <p>استعرض الدورات المتاحة أو سجّل دخولك لإدارة كل شيء.</p>
+    </div>
+    <div class="strip-actions">
+      <a class="cta primary" href="/courses/">الدورات</a>
+      <a class="cta red" href="/accounts/login/">تسجيل دخول</a>
+    </div>
+  </div>
+</section>
+
+<style>
+  :root{
+    --red:#B71C1C;
+    --red-dark:#8e1414;
+    --text:#0f172a;
+    --muted:#475569;
+    --line:#e5e7eb;
+    --soft:#f6f7f9;
+    --paper:#fbfaf7;
+    --radius:14px;
+    --shadow:0 10px 24px rgba(0,0,0,.10);
+  }
+
+  .hero{
+    background:
+      radial-gradient(1200px 400px at 20% 0%, #b71c1c12, transparent 60%),
+      radial-gradient(900px 380px at 80% 10%, #00000008, transparent 60%),
+      linear-gradient(180deg, #fff, var(--paper));
+    border-bottom:1px solid #eee;
+    padding:46px 0 30px;
+  }
+
+  .hero-grid{
+    display:grid;
+    grid-template-columns: 1.2fr .9fr;
+    gap:26px;
+    align-items:center;
+  }
+
+  .badge{
+    display:inline-flex;
+    gap:8px;
+    align-items:center;
+    padding:8px 12px;
+    border:1px solid var(--line);
+    background:#fff;
+    border-radius:999px;
+    font-weight:900;
+    color:#111827;
+    box-shadow:0 6px 14px rgba(0,0,0,.05);
+  }
+
+  .hero-title{
+    margin:14px 0 10px;
+    font-size:44px;
+    line-height:1.2;
+    font-weight:900;
+    letter-spacing:-.3px;
+  }
+  .hero-title .highlight{
+    color:var(--red);
+  }
+
+  .hero-desc{
+    margin:0 0 16px;
+    font-size:16px;
+    line-height:1.9;
+    color:var(--muted);
+    font-weight:700;
+    max-width:52ch;
+  }
+
+  .hero-actions{
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+    margin:14px 0 18px;
+  }
+
+  .cta{
+    height:48px;
+    padding:0 16px;
+    border-radius:14px;
+    border:1px solid var(--line);
+    background:#fff;
+    font-weight:900;
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    box-shadow:0 10px 20px rgba(0,0,0,.06);
+    transition:.2s ease;
+  }
+  .cta:hover{ transform:translateY(-1px); }
+
+  .cta.primary{
+    border-color:#00000010;
+    background:#111827;
+    color:#fff;
+  }
+  .cta.red{
+    background:var(--red);
+    color:#fff;
+    border-color:var(--red);
+  }
+  .cta.red:hover{ background:var(--red-dark); border-color:var(--red-dark); }
+
+  .cta.ghost{
+    background:#fff;
+  }
+
+  .hero-stats{
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+    margin-top:10px;
+  }
+  .stat{
+    background:#fff;
+    border:1px solid var(--line);
+    border-radius:16px;
+    padding:12px 14px;
+    min-width:140px;
+    box-shadow:0 10px 20px rgba(0,0,0,.05);
+  }
+  .stat b{
+    display:block;
+    font-size:20px;
+    font-weight:900;
+  }
+  .stat span{
+    color:var(--muted);
+    font-weight:800;
+    font-size:12px;
+  }
+
+  .hero-card{
+    background:#fff;
+    border:1px solid var(--line);
+    border-radius:22px;
+    box-shadow:var(--shadow);
+    overflow:hidden;
+  }
+  .card-top{
+    padding:14px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    border-bottom:1px solid #f1f5f9;
+    background:linear-gradient(90deg, #ffffff, #fbfaf7);
+  }
+  .logo-mini{
+    width:60px;height:40px;
+    display:grid;
+    place-items:center;
+    overflow:hidden;
+  }
+  .logo-mini img{ width:100%; height:100%; object-fit:contain; }
+  .chip{
+    padding:8px 10px;
+    border-radius:999px;
+    font-weight:900;
+    border:1px solid var(--line);
+    background:#fff;
+  }
+
+  .card-body{ padding:16px; display:flex; flex-direction:column; gap:14px; }
+  .kpi{
+    border:1px solid #eef2f7;
+    background:#fff;
+    border-radius:16px;
+    padding:12px;
+  }
+  .kpi-row{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    font-weight:900;
+  }
+  .kpi-row span{ color:var(--muted); font-weight:800; }
+  .bar{
+    height:10px;
+    border-radius:999px;
+    background:#f1f5f9;
+    overflow:hidden;
+    margin-top:10px;
+  }
+  .bar i{
+    display:block;
+    height:100%;
+    background:linear-gradient(90deg, var(--red), #111827);
+    border-radius:999px;
+  }
+  .card-note{
+    color:var(--muted);
+    font-weight:800;
+    line-height:1.8;
+    font-size:13px;
+    background:var(--paper);
+    border:1px dashed #e7e5e1;
+    padding:10px 12px;
+    border-radius:16px;
+  }
+
+  .features{
+    padding:34px 0;
+    background:#fff;
+  }
+  .sec-title{
+    margin:0;
+    font-size:26px;
+    font-weight:900;
+  }
+  .sec-desc{
+    margin:8px 0 18px;
+    color:var(--muted);
+    font-weight:800;
+    line-height:1.9;
+    max-width:70ch;
+  }
+  .feat-grid{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:14px;
+  }
+  .feat{
+    border:1px solid var(--line);
+    border-radius:18px;
+    padding:16px;
+    background:linear-gradient(180deg,#fff,var(--paper));
+    box-shadow:0 10px 20px rgba(0,0,0,.05);
+  }
+  .feat .icon{
+    width:44px;height:44px;
+    border-radius:14px;
+    display:grid;
+    place-items:center;
+    font-weight:900;
+    border:1px solid #00000010;
+    background:#fff;
+    margin-bottom:10px;
+  }
+  .feat h3{
+    margin:0 0 6px;
+    font-size:16px;
+    font-weight:900;
+  }
+  .feat p{
+    margin:0;
+    color:var(--muted);
+    font-weight:700;
+    line-height:1.9;
+    font-size:14px;
+  }
+
+  .cta-strip{
+    padding:18px 0 0;
+    background:#fff;
+  }
+  .strip{
+    border:1px solid var(--line);
+    border-radius:22px;
+    padding:18px;
+    background:linear-gradient(90deg, #111827, var(--red));
+    color:#fff;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:16px;
+  }
+  .strip h3{ margin:0; font-size:20px; font-weight:900; }
+  .strip p{ margin:6px 0 0; opacity:.95; font-weight:700; line-height:1.8; }
+
+  .strip-actions{
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+  }
+  .strip .cta{
+    box-shadow:none;
+    border-color:transparent;
+  }
+  .strip .cta.primary{
+    background:#fff;
+    color:#111827;
+  }
+  .strip .cta.red{
+    background:#00000030;
+    border:1px solid #ffffff40;
+    color:#fff;
+  }
+
+  @media (max-width: 980px){
+    .hero-grid{ grid-template-columns:1fr; }
+    .hero-title{ font-size:34px; }
+    .feat-grid{ grid-template-columns:1fr 1fr; }
+    .strip{ flex-direction:column; align-items:flex-start; }
+  }
+
+  @media (max-width: 520px){
+    .feat-grid{ grid-template-columns:1fr; }
+    .hero-title{ font-size:30px; }
+  }
+</style>

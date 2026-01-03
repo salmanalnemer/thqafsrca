@@ -1,24 +1,28 @@
-"""
-URL configuration for thqaf project.
-
-The `urlpatterns` list routes URLs to views. For more information please see:
-https://docs.djangoproject.com/en/6.0/topics/http/urls/
-"""
-
+# thqaf/urls.py
 from django.contrib import admin
 from django.urls import path, include
+from django.views.generic import TemplateView
+
+from django.conf import settings
+from django.conf.urls.static import static
 
 urlpatterns = [
-    # Django Admin
-    path('admin/', admin.site.urls),
+    # صفحة الهبوط (الرئيسية) - الأفضل تكون home.html وليس base.html
+    path("", TemplateView.as_view(template_name="home.html"), name="home"),
 
-    # Platform apps (8)
-    path('accounts/', include('accounts.urls')),            # الهوية/الدخول/OTP
-    path('regions/', include('regions.urls')),              # المناطق
-    path('organizations/', include('organizations.urls')),  # الجهات + تسجيل الجهات
-    path('individuals/', include('individuals.urls')),      # الأفراد + تسجيل الأفراد
-    path('courses/', include('courses.urls')),              # الدورات
-    path('attendance/', include('attendance.urls')),        # تأكيد الحضور
-    path('certificates/', include('certificates.urls')),    # الشهادات + التحقق
-    path('support/', include('support.urls')),              # الدعم الفني
+    path("admin/", admin.site.urls),
+
+    path("accounts/", include("accounts.urls")),
+    path("regions/", include("regions.urls")),
+    path("organizations/", include("organizations.urls")),
+    path("individuals/", include("individuals.urls")),
+    path("courses/", include("courses.urls")),
+    path("attendance/", include("attendance.urls")),
+    path("certificates/", include("certificates.urls")),
+    path("support/", include("support.urls")),
 ]
+
+# ✅ تفعيل خدمة ملفات static/media أثناء التطوير فقط (DEBUG=True)
+if settings.DEBUG:
+    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -1,0 +1,887 @@
+/* =========================================================
+   THQAF - base.css (FULL)
+   - Mobile sidebar menu: smaller + no wrapping (no extra column/line)
+   - Footer: NO cards, just columns (same order as HTML)
+   ========================================================= */
+
+/* -------------------------
+   Reset / Base
+------------------------- */
+*,
+*::before,
+*::after { box-sizing: border-box; }
+
+html, body { height: 100%; }
+
+body{
+  margin: 0;
+  font-family: "Tajawal", system-ui, -apple-system, "Segoe UI", Arial, sans-serif;
+  color: #0b1220;
+  background: #ffffff;
+  line-height: 1.6;
+}
+
+img{ max-width:100%; display:block; }
+a{ color:inherit; text-decoration:none; }
+button, input{ font-family:inherit; }
+
+:focus-visible{
+  outline: 3px solid rgba(181, 138, 42, .45);
+  outline-offset: 2px;
+  border-radius: 10px;
+}
+
+/* -------------------------
+   Theme
+------------------------- */
+:root{
+  --brand-950:#230606;
+  --brand-900:#bf1313;
+  --brand-850:#3d0909;
+  --brand-800:#bf1313;
+  --brand-700:#103a63;
+
+  --gold-700:#b8b4f4;
+  --gold-600:#b58a2a;
+
+  --ink-950:#200b0b;
+  --ink-800:#1f2937;
+  --ink-700:#334155;
+  --ink-600:#475569;
+  --ink-500:#64748b;
+
+  --line-300:#d6dde8;
+  --line-200:#e5e7eb;
+  --line-150:#edf1f7;
+
+  --bg-50:#fcf7f7;
+
+  --radius-2xl: 22px;
+  --radius-xl: 18px;
+  --radius-lg: 16px;
+  --radius-md: 12px;
+
+  --shadow-1: 0 10px 28px rgba(2, 8, 23, .10);
+  --shadow-2: 0 18px 45px rgba(2, 8, 23, .14);
+
+  --wrap: 1200px;
+  --sidebar-w: min(88vw, 360px);
+}
+
+/* -------------------------
+   Layout helpers
+------------------------- */
+.wrap{ max-width: var(--wrap); margin: 0 auto; padding: 0 16px; }
+.row{ display:flex; align-items:center; justify-content:space-between; gap:14px; }
+
+/* -------------------------
+   Main
+------------------------- */
+main{
+  min-height: 55vh;
+  padding: 26px 0 30px;
+  background: #fff;
+}
+
+/* =========================================================
+   HEADER
+========================================================= */
+.header{
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  background: #fff;
+  border-bottom: 1px solid var(--line-200);
+}
+
+/* Topbar */
+.topbar{
+  position: relative;
+  background: linear-gradient(90deg,  #e6e4e4);
+  border-bottom: 1px solid var(--line-200);
+}
+.topbar::before{
+  content:"";
+  position:absolute;
+  inset: 0;
+  border-top: 3px solid var(--gold-600);
+  pointer-events:none;
+}
+.topbar .row{ padding: 10px 0; }
+
+.topbar .meta{
+  display:flex;
+  align-items:center;
+  gap: 10px;
+  color: #ffffff;
+  font-weight: 900;
+  font-size: 13px;
+}
+.topbar .meta i{
+  font-size: 16px;
+  color:  #ffffff;
+}
+
+.topbar .mini-actions{
+  display:flex;
+  align-items:center;
+  gap: 10px;
+}
+
+.topbar a.link{
+  display:inline-flex;
+  align-items:center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: 999px;
+  border: 1px solid var(--line-200);
+  background:#0c8d0e;
+  color: #fff;
+  font-weight: 1000;
+  font-size: 10px;
+  transition: transform .15s ease, box-shadow .15s ease, border-color .15s ease;
+  
+}
+
+.sam1{
+  display:inline-flex;
+  align-items:center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: 999px;
+  border: 1px solid var(--line-200);
+  background:#bebcbc;
+  color: #1f1f1f;
+  font-weight: 1000;
+  font-size: 10px;
+  transition: transform .15s ease, box-shadow .15s ease, border-color .15s ease;
+}
+.topbar a.link:hover{
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-1);
+  border-color: rgba(176, 39, 39, 0.18);
+}
+.topbar a.link.active{
+  border-color: rgba(181,138,42,.55);
+  box-shadow: 0 0 0 4px rgba(181,138,42,.12);
+}
+
+.topbar .mini-btn{
+  display:inline-flex;
+  align-items:center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: 999px;
+  border: 1px solid rgba(11,42,74,.18);
+  background: rgba(11,42,74,.06);
+  color: var(--brand-800);
+  font-weight: 1000;
+  font-size: 10px;
+  cursor:pointer;
+}
+
+/* Identity row */
+.top{ position: relative; background:#fff; }
+.top::after{
+  content:"";
+  position:absolute;
+  left:0; right:0; bottom:-1px;
+  height: 1px;
+  background: var(--line-200);
+}
+.top .row{ padding: 16px 0; }
+
+.brand{
+  display:flex;
+  align-items:center;
+  gap: 12px;
+  min-width: 260px;
+}
+.brand .logo{
+  width: 56px;
+  height: 56px;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--line-200);
+  background: linear-gradient(180deg, #fff, var(--bg-50));
+  box-shadow: 0 14px 26px rgba(2,8,23,.08);
+  overflow:hidden;
+}
+.brand .logo img{
+  width:100%;
+  height:100%;
+  object-fit: contain;
+  padding: 10px;
+}
+.brand .stack{
+  display:flex;
+  flex-direction:column;
+  gap: 3px;
+}
+.brand .stack b{
+  font-size: 18px;
+  font-weight: 1000;
+  color: var(--ink-950);
+}
+.brand .stack span{
+  font-size: 12.5px;
+  font-weight: 900;
+  color: var(--ink-600);
+}
+
+/* Search */
+.search{
+  flex: 1;
+  max-width: 360px;
+  position: relative;
+}
+.search .icon{
+  position:absolute;
+  right: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 18px;
+  height: 18px;
+  color: var(--ink-500);
+}
+.search input{
+  width: 100%;
+  height: 46px;
+  border-radius: 999px;
+  border: 1px solid var(--line-200);
+  background: linear-gradient(180deg, #ffffff, var(--bg-50));
+  padding: 0 44px 0 16px;
+  font-size: 14px;
+  font-weight: 1000;
+  color: var(--ink-950);
+  outline: none;
+}
+.search input:focus{
+  border-color: rgba(181,138,42,.55);
+  box-shadow: 0 0 0 5px rgba(181,138,42,.12);
+}
+
+/* Hamburger */
+.hamburger{
+  display:none;
+  height: 46px;
+  padding: 0 14px;
+  border-radius: 999px;
+  border: 1px solid var(--line-200);
+  background:#fff;
+  color: var(--brand-800);
+  font-weight: 1000;
+  cursor:pointer;
+}
+
+/* =========================================================
+   NAV (Desktop)
+========================================================= */
+.nav{
+  position: relative;
+  background: linear-gradient(90deg, var(--brand-900), var(--brand-800));
+}
+.nav::after{
+  content:"";
+  position:absolute;
+  left:0; right:0; bottom:0;
+  height: 3px;
+  background: linear-gradient(90deg, rgba(181,138,42,0), var(--gold-600), rgba(181,138,42,0));
+  pointer-events:none;
+}
+.nav .row{ padding: 10px 0; }
+
+.menu{
+  display:flex;
+  align-items:center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+/* Links / Buttons */
+.nav a.link,
+.dropbtn{
+  display:inline-flex;
+  align-items:center;
+  gap: 10px;
+  height: 44px;
+  padding: 0 14px;
+  border-radius: 12px;
+  border: 1px solid rgba(255,255,255,.10);
+  background: rgba(255,255,255,.04);
+  color: rgba(255,255,255,.92);
+  font-weight: 1000;
+  font-size: 13px;
+  cursor:pointer;
+}
+
+.nav a.link i,
+.dropbtn i{
+  font-size: 18px;
+  color: rgba(255,255,255,.92);
+}
+
+.dropdown{ position: relative; display:inline-flex; }
+
+.dropbtn .ti-chevron-down{
+  margin-inline-start: 6px;
+  font-size: 16px;
+  color: rgba(255,255,255,.72);
+  transition: transform .18s ease;
+}
+.dropdown.open .dropbtn .ti-chevron-down,
+.dropbtn[aria-expanded="true"] .ti-chevron-down{
+  transform: rotate(180deg);
+}
+
+/* Dropdown menu (Desktop) */
+.dropdown-menu{
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+  width: 340px;
+  background: #ffffff;
+  color: var(--ink-950);
+  border-radius: var(--radius-2xl);
+  border: 1px solid var(--line-200);
+  box-shadow: var(--shadow-2);
+  padding: 10px;
+  display: none;
+  z-index: 2000;
+  overflow: hidden;
+}
+.dropdown.open .dropdown-menu,
+.dropdown-menu.open,
+.dropdown-menu.show{ display:block; }
+
+.dropdown-menu hr{
+  border: 0;
+  border-top: 1px solid var(--line-150);
+  margin: 10px 8px;
+}
+
+.dropdown-item{
+  display:flex;
+  align-items:center;
+  gap: 10px;
+  padding: 11px 12px;
+  border-radius: 14px;
+  border: 1px solid transparent;
+  color: var(--ink-950);
+  font-weight: 1000;
+  font-size: 14px;
+}
+.dropdown-item i{
+  font-size: 18px;
+  color: var(--brand-800);
+}
+.dropdown-item:hover{
+  background: var(--bg-50);
+  border-color: rgba(11,42,74,.12);
+}
+
+/* =========================================================
+   MOBILE: Sidebar + Smaller menu + no wrapping
+========================================================= */
+
+/* Overlay when menu open (JS adds body.menu-lock) */
+body.menu-lock{ overflow: hidden; }
+body.menu-lock::before{
+  content:"";
+  position: fixed;
+  inset: 0;
+  background: rgba(2, 6, 23, .45);
+  z-index: 2100;
+  pointer-events: auto;
+}
+
+@media (max-width: 1100px){
+  .top .row{ flex-wrap: wrap; }
+
+  .search{
+    order: 3;
+    flex-basis: 100%;
+    max-width: 100%;
+  }
+
+  .hamburger{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+  }
+
+  /* Sidebar container */
+  .menu{
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: var(--sidebar-w);
+    height: 100vh;
+
+    background: linear-gradient(180deg, var(--brand-950), var(--brand-800));
+    border-left: 1px solid rgba(255,255,255,.12);
+    box-shadow: 0 22px 60px rgba(0,0,0,.35);
+
+    display:flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+
+    padding: 14px;
+    padding-top: 16px;
+
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+
+    transform: translateX(110%);
+    opacity: .001;
+    visibility: hidden;
+    transition: transform .28s cubic-bezier(.22,1,.36,1), opacity .20s ease, visibility .20s ease;
+
+    z-index: 2200;
+    flex-wrap: nowrap !important; /* ✅ يمنع أي لف */
+  }
+
+  .menu.open{
+    transform: translateX(0);
+    opacity: 1;
+    visibility: visible;
+  }
+
+  /* ✅ أصغر + ثابت (ما يلف ولا يصير عمود/سطر ثاني) */
+  .nav a.link,
+  .dropbtn{
+    width: 100%;
+    height: 44px;                 /* ✅ أصغر */
+    border-radius: 14px;
+    padding: 0 12px;
+
+    justify-content: flex-start !important;
+    text-align: right;
+
+    background: rgba(255,255,255,.06);
+    border: 1px solid rgba(255,255,255,.14);
+    gap: 8px;                     /* ✅ تقليل المسافة */
+    flex-wrap: nowrap !important; /* ✅ ممنوع يلف */
+  }
+
+  .nav a.link i,
+  .dropbtn i{
+    font-size: 18px;              /* ✅ أصغر */
+    margin-inline-end: 8px;
+    flex: 0 0 auto;
+  }
+
+  .nav a.link span,
+  .dropbtn span{
+    font-size: 14px;              /* ✅ صغّر الخط */
+    font-weight: 1000;
+    flex: 1 1 auto;
+
+    white-space: nowrap;          /* ✅ لا يلف */
+    overflow: hidden;             /* ✅ يمنع تكوين عمود/سطر */
+    text-overflow: ellipsis;      /* ✅ ... */
+    min-width: 0;                 /* ✅ مهم مع flex */
+  }
+
+  /* Chevron to the far edge */
+  .dropbtn .ti-chevron-down{
+    margin-inline-start: auto;
+    font-size: 16px;              /* ✅ أصغر */
+    opacity: .9;
+    flex: 0 0 auto;
+  }
+
+  .dropdown{ width: 100%; display:block; }
+
+  /* Inline dropdown inside sidebar */
+  .dropdown-menu{
+    position: static !important;
+    width: 100% !important;
+    margin: 8px 0 0 !important;
+    padding: 10px !important;
+
+    border-radius: 14px !important;
+    box-shadow: none !important;
+
+    background: rgba(255,255,255,.06) !important;
+    color: rgba(255,255,255,.92) !important;
+    border: 1px solid rgba(255,255,255,.14) !important;
+
+    display: none;
+  }
+
+  .dropdown.open .dropdown-menu,
+  .dropdown-menu.open,
+  .dropdown-menu.show{
+    display: block !important;
+  }
+
+  .dropdown-menu hr{
+    border-top: 1px solid rgba(255,255,255,.14) !important;
+  }
+
+  .dropdown-item{
+    background: rgba(0,0,0,.16) !important;
+    border: 1px solid rgba(255,255,255,.10) !important;
+    color: rgba(255,255,255,.92) !important;
+
+    border-radius: 12px;
+    padding: 11px 10px;
+    gap: 8px;
+
+    flex-wrap: nowrap !important;
+  }
+
+  .dropdown-item i{
+    color: rgba(255,255,255,.92) !important;
+    font-size: 16px;
+    flex: 0 0 auto;
+  }
+
+  .dropdown-item span{
+    font-size: 13px;
+    font-weight: 1000;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    min-width: 0;
+  }
+}
+
+/* =========================================================
+   ADMIN MODAL (unchanged)
+========================================================= */
+.admin-modal-overlay{
+  position: fixed;
+  inset: 0;
+  background: rgba(2, 6, 23, .60);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  z-index: 3000;
+}
+.admin-modal-overlay.active{ display:flex; }
+
+.admin-modal{
+  width: min(520px, 100%);
+  background: #fff;
+  border-radius: var(--radius-2xl);
+  border: 1px solid var(--line-200);
+  box-shadow: var(--shadow-2);
+  padding: 18px 18px 16px;
+  position: relative;
+}
+.admin-close{
+  position:absolute;
+  top: 10px;
+  left: 12px;
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  border: 1px solid var(--line-200);
+  background: #fff;
+  cursor:pointer;
+  font-size: 22px;
+  line-height: 1;
+  color: var(--ink-700);
+}
+.admin-modal h3{
+  margin: 8px 0 14px;
+  font-size: 18px;
+  font-weight: 1000;
+  color: var(--ink-950);
+}
+.admin-field{ margin: 12px 0; }
+.admin-field label{
+  display:block;
+  font-weight: 1000;
+  font-size: 13px;
+  color: var(--ink-700);
+  margin-bottom: 6px;
+}
+.admin-field input{
+  width: 100%;
+  height: 46px;
+  border-radius: 14px;
+  border: 1px solid var(--line-200);
+  background: #fff;
+  padding: 0 12px;
+  font-size: 14px;
+  font-weight: 900;
+  outline: none;
+}
+.admin-actions{
+  display:flex;
+  gap: 10px;
+  margin-top: 14px;
+}
+.admin-actions button{
+  flex: 1;
+  height: 46px;
+  border-radius: 14px;
+  border: 1px solid var(--line-200);
+  cursor:pointer;
+  font-weight: 1000;
+  font-size: 14px;
+}
+.admin-login-btn{
+  background: linear-gradient(90deg, var(--brand-800), var(--brand-700));
+  color: #fff;
+  border-color: rgba(255,255,255,.12);
+}
+.admin-cancel-btn{
+  background: #fff;
+  color: var(--ink-800);
+}
+
+/* =========================================================
+   FOOTER (NO CARDS) - columns only, same HTML order
+========================================================= */
+.s-footer{
+  background: linear-gradient(180deg, #191650, #191650,#191650);
+  color: rgba(255,255,255,.86);
+  margin-top: 30px;
+}
+
+.s-footer__wrap{
+  max-width: var(--wrap);
+  margin: 0 auto;
+  padding: 28px 16px 18px;
+}
+
+.s-footer__grid{
+  display:grid;
+  grid-template-columns: 1.4fr 1fr 1fr 1fr 1fr; /* نفس ترتيب الأقسام */
+  gap: 18px;
+}
+
+/* ✅ إزالة الكروت */
+.s-footer__col{
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  padding: 0;
+}
+
+.s-footer__title{
+  margin: 0 0 10px;
+  font-size: 14px;
+  font-weight: 1000;
+  color: rgba(255,255,255,.95);
+}
+
+.s-footer__divider{
+  height: 2px;
+  width: 56px;
+  background: rgba(240, 240, 240, 0.85);
+  border-radius: 999px;
+  margin-bottom: 12px;
+}
+
+.s-footer__mt{ margin-top: 14px; }
+
+.s-footer__icons{
+  display:flex;
+  flex-wrap:wrap;
+  gap: 10px;
+  margin-bottom: 6px;
+}
+.s-footer__icon{
+  width: 44px;
+  height: 44px;
+  border-radius: 14px;
+  border: 1px solid rgba(255,255,255,.10);
+  background: rgba(255,255,255,.06);
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  color: rgba(255,255,255,.92);
+  cursor:pointer;
+}
+
+.s-footer__stores{
+  display:flex;
+  gap: 10px;
+  flex-wrap:wrap;
+}
+.s-footer__store{
+  flex:1;
+  min-width: 150px;
+  display:flex;
+  align-items:center;
+  gap: 10px;
+  padding: 12px;
+  border-radius: 16px;
+  border: 1px solid rgba(255,255,255,.10);
+  background: rgba(255,255,255,.06);
+}
+.s-footer__store i{ font-size: 22px; }
+.s-footer__store small{
+  display:block;
+  font-size: 12px;
+  color: rgba(255,255,255,.75);
+  font-weight: 900;
+}
+.s-footer__store b{
+  display:block;
+  font-size: 13px;
+  font-weight: 1000;
+  color: rgba(255,255,255,.95);
+}
+
+.s-footer__list{
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display:flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.s-footer__list a{
+  display:flex;
+  align-items:center;
+  gap: 8px;
+  color: rgba(255,255,255,.88);
+  font-weight: 900;
+  font-size: 13px;
+}
+
+button.login{
+  width: 100%;
+  height: 44px;
+  border-radius: 14px;
+  border: 1px solid rgba(255,255,255,.12);
+  background: rgba(181,138,42,.18);
+  color: rgba(255,255,255,.95);
+  font-weight: 1000;
+  cursor:pointer;
+}
+
+.s-footer__subbar{
+  margin-top: 16px;
+  padding: 12px 14px;
+  border-radius: var(--radius-2xl);
+  border: 1px solid rgba(255,255,255,.08);
+  background: rgba(255,255,255,.04);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.s-footer__subbar a{
+  color: rgba(255,255,255,.85);
+  font-weight: 900;
+  font-size: 13px;
+}
+.s-footer__dot{ opacity: .6; }
+
+.s-footer__bottom{
+  margin-top: 18px;
+  text-align: center;
+}
+.s-footer__logos{
+  display:flex;
+  justify-content:center;
+  margin-bottom: 10px;
+}
+.s-footer__logos img{
+  max-height: 56px;
+  width:auto;
+  opacity: .95;
+}
+.s-footer__bottom h6{
+  margin: 10px 0 12px;
+  font-size: 12.5px;
+  font-weight: 900;
+  color: rgba(255,255,255,.78);
+}
+.s-footer__copy p{
+  margin: 4px 0;
+  font-size: 12.5px;
+  font-weight: 900;
+  color: rgba(255,255,255,.80);
+}
+
+/* Floating button */
+.s-footer__float{
+  position: fixed;
+  left: 16px;
+  bottom: 16px;
+  width: 54px;
+  height: 54px;
+  border-radius: 18px;
+  border: 1px solid rgba(255,255,255,.14);
+  background: rgba(7, 21, 38, .92);
+  color: #fff;
+  cursor:pointer;
+  z-index: 2500;
+  box-shadow: 0 18px 40px rgba(0,0,0,.28);
+}
+.s-footer__kebab{
+  width: 18px; height: 18px;
+  display:inline-block;
+  position: relative;
+}
+.s-footer__kebab::before,
+.s-footer__kebab::after{
+  content:"";
+  position:absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: rgba(255,255,255,.92);
+}
+.s-footer__kebab::before{ top: 0; }
+.s-footer__kebab::after{ bottom: 0; }
+.s-footer__kebab{
+  background: rgba(255,255,255,.92);
+  border-radius: 50%;
+}
+
+/* Footer responsive */
+@media (max-width: 1100px){
+  .s-footer__grid{ grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 640px){
+  .s-footer__grid{ grid-template-columns: 1fr; }
+  .s-footer__float{ left: 12px; bottom: 12px; }
+}
+
+/* =========================================================
+   HOTFIX - Sidebar is unclickable (overlay above it)
+   ضع هذا في آخر ملف base.css
+========================================================= */
+
+/* ✅ اقفل أي overlay قديم كان معمول بـ ::before */
+body.menu-lock::before{
+  content: none !important;
+  display: none !important;
+  pointer-events: none !important;
+}
+
+/* ✅ خلك أعلى من أي عناصر في الصفحة */
+.header{ z-index: 99990 !important; }
+
+/* ✅ السايدبار لازم يكون فوق الـ overlay */
+@media (max-width: 1100px){
+  #menu.menu{
+    position: fixed !important;
+    z-index: 99999 !important;
+    pointer-events: auto !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+  }
+  #menu.menu *{
+    pointer-events: auto !important;
+  }
+
+  /* ✅ الـ overlay تحت السايدبار (مو فوقه) */
+  .menu-overlay{
+    z-index: 99980 !important;
+    pointer-events: auto !important;
+  }
+}
