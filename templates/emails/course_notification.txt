@@ -1,0 +1,8 @@
+إشعار دورة تدريبية - منصة ثقف
+
+اسم الدورة: {{ course_title }}
+{% if start_at %}موعد البداية: {{ start_at }}{% endif %}
+{% if extra %}ملاحظات: {{ extra }}{% endif %}
+
+للاستفسار: {{ support_email }}
+© {{ year }} منصة ثقف

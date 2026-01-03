@@ -1,0 +1,168 @@
+{% load static %}
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <title>رمز التحقق | ثقف</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+
+  <style>
+    :root{
+      --red:#B71C1C;
+      --red-dark:#8e1414;
+      --text:#0f172a;
+      --muted:#475569;
+      --line:#e5e7eb;
+      --soft:#f6f7f9;
+      --paper:#fbfaf7;
+      --radius:14px;
+      --shadow:0 10px 24px rgba(0,0,0,.10);
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family:"Tajawal",sans-serif;
+      color:var(--text);
+      background:
+        radial-gradient(1200px 600px at 100% 0, rgba(183,28,28,.12), transparent 60%),
+        radial-gradient(900px 500px at 0 100%, rgba(15,23,42,.10), transparent 60%),
+        linear-gradient(180deg, #fff, #fafafa);
+      min-height:100vh;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:24px;
+    }
+    .card{
+      width:min(520px, 100%);
+      background:#fff;
+      border:1px solid var(--line);
+      border-radius:18px;
+      box-shadow:var(--shadow);
+      overflow:hidden;
+    }
+    .head{
+      padding:18px 20px;
+      background:linear-gradient(135deg, rgba(183,28,28,.12), rgba(183,28,28,.02));
+      border-bottom:1px solid var(--line);
+      display:flex;
+      align-items:center;
+      gap:12px;
+    }
+    .logo{
+      width:44px;height:44px;
+      border-radius:12px;
+      background:#fff;
+      border:1px solid var(--line);
+      display:flex;align-items:center;justify-content:center;
+      overflow:hidden;
+    }
+    .logo img{width:100%;height:100%;object-fit:contain}
+    .title{font-weight:900;margin:0;font-size:18px}
+    .subtitle{margin:2px 0 0;color:var(--muted);font-size:13px}
+    .body{padding:18px 20px 20px}
+    .alert{
+      background:var(--paper);
+      border:1px dashed rgba(183,28,28,.35);
+      border-radius:14px;
+      padding:12px 14px;
+      margin-bottom:14px;
+      color:var(--muted);
+      font-size:13px;
+      line-height:1.6;
+    }
+    label{display:block;font-weight:800;margin:10px 0 6px}
+    input{
+      width:100%;
+      padding:12px 14px;
+      border:1px solid var(--line);
+      border-radius:12px;
+      font-size:16px;
+      outline:none;
+    }
+    input:focus{border-color:rgba(183,28,28,.55);box-shadow:0 0 0 4px rgba(183,28,28,.10)}
+    .row{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+    .btn{
+      cursor:pointer;
+      border:none;
+      border-radius:12px;
+      padding:12px 14px;
+      font-weight:900;
+      font-family:"Tajawal",sans-serif;
+    }
+    .btn-primary{background:var(--red);color:#fff;flex:1}
+    .btn-primary:hover{background:var(--red-dark)}
+    .btn-secondary{
+      background:#fff;
+      color:var(--red);
+      border:1px solid rgba(183,28,28,.35);
+      flex:1;
+    }
+    .btn-secondary:hover{background:rgba(183,28,28,.06)}
+    .hint{margin-top:10px;color:var(--muted);font-size:13px}
+    .messages{margin:0 0 12px;padding:0;list-style:none}
+    .messages li{
+      border-radius:12px;
+      padding:10px 12px;
+      margin-bottom:8px;
+      font-size:13px;
+      border:1px solid var(--line);
+      background:var(--soft);
+    }
+    .messages li.error{border-color:rgba(183,28,28,.35);background:rgba(183,28,28,.06)}
+    .messages li.success{border-color:rgba(22,163,74,.25);background:rgba(22,163,74,.06)}
+    .messages li.info{border-color:rgba(2,132,199,.25);background:rgba(2,132,199,.06)}
+  </style>
+</head>
+<body>
+
+  <div class="card">
+    <div class="head">
+      <div class="logo">
+        <img src="{% static 'assets/img/logothqaf.png' %}" alt="ثقف">
+      </div>
+      <div>
+        <p class="title">التحقق الإضافي</p>
+        <p class="subtitle">أدخل رمز التحقق المرسل إلى بريدك</p>
+      </div>
+    </div>
+
+    <div class="body">
+      {% if messages %}
+        <ul class="messages">
+          {% for message in messages %}
+            <li class="{{ message.tags }}">{{ message }}</li>
+          {% endfor %}
+        </ul>
+      {% endif %}
+
+      <div class="alert">
+        تم إرسال رمز تحقق إلى: <b>{{ email }}</b><br>
+        إذا لم تجده، افحص صندوق الرسائل غير الهامة (Spam) أو أعد الإرسال.
+      </div>
+
+      <!-- Verify OTP -->
+      <form method="post" action="{% url 'accounts:login_otp' %}">
+        {% csrf_token %}
+        <label for="code">رمز التحقق</label>
+        <input id="code" name="code" inputmode="numeric" autocomplete="one-time-code" placeholder="مثال: 123456" required>
+        <div class="row">
+          <button class="btn btn-primary" type="submit">تأكيد</button>
+          <a class="btn btn-secondary" href="{% url 'accounts:login' %}" style="text-decoration:none;display:flex;align-items:center;justify-content:center;">رجوع</a>
+        </div>
+      </form>
+
+      <!-- Resend OTP -->
+      <form method="post" action="{% url 'accounts:resend_login_otp' %}" style="margin-top:10px;">
+        {% csrf_token %}
+        <button class="btn btn-secondary" type="submit" style="width:100%;">إعادة إرسال الرمز</button>
+      </form>
+
+      <div class="hint">إذا استمرت المشكلة، تأكد أن البريد في ملفك الشخصي صحيح وبحروف إنجليزية.</div>
+    </div>
+  </div>
+
+</body>
+</html>

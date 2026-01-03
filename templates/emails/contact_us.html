@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>تواصل معنا | ثقف</title>
+  <style>
+    body{margin:0;padding:0;background:#f6f7f9;color:#0f172a;font-family:Arial,Helvetica,sans-serif}
+    .wrap{width:100%;padding:24px 12px;background:#f6f7f9}
+    .card{max-width:560px;margin:0 auto;background:#fff;border:1px solid #e5e7eb;border-radius:18px;overflow:hidden;box-shadow:0 10px 24px rgba(0,0,0,.10)}
+    .head{padding:18px 20px;background:linear-gradient(135deg, rgba(183,28,28,.14), rgba(183,28,28,.03));border-bottom:1px solid #e5e7eb}
+    .body{padding:18px 20px 22px}
+    .title{margin:0;font-weight:900;font-size:18px;line-height:1.6}
+    .meta{margin:10px 0 0;color:#475569;font-size:13px;line-height:1.9}
+    .box{margin-top:14px;background:#fbfaf7;border:1px dashed rgba(183,28,28,.35);border-radius:14px;padding:12px 14px;color:#475569;font-size:13px;line-height:1.9;white-space:pre-wrap}
+    .foot{padding:14px 20px;border-top:1px solid #e5e7eb;background:#fbfbfd;color:#64748b;font-size:12px;line-height:1.9;text-align:center}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="card">
+      <div class="head">
+        <p class="title">رسالة تواصل معنا</p>
+      </div>
+
+      <div class="body">
+        <div class="meta"><b>الاسم:</b> {{ from_name }}</div>
+        <div class="meta"><b>البريد:</b> {{ from_email }}</div>
+
+        <div class="box">{{ message_text }}</div>
+      </div>
+
+      <div class="foot">© {{ year }} منصة ثقف</div>
+    </div>
+  </div>
+</body>
+</html>

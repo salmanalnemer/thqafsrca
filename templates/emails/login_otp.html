@@ -1,0 +1,200 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>رمز التحقق | ثقف</title>
+
+  <style>
+    :root{
+      --red:#B71C1C;
+      --red-dark:#8e1414;
+      --text:#0f172a;
+      --muted:#475569;
+      --line:#e5e7eb;
+      --soft:#f6f7f9;
+      --paper:#fbfaf7;
+      --shadow:0 10px 24px rgba(0,0,0,.10);
+    }
+
+    body{margin:0;padding:0;background:#f6f7f9;color:var(--text);font-family:Arial,Helvetica,sans-serif;}
+    .wrap{width:100%;padding:24px 12px;background:#f6f7f9;}
+    .card{
+      width:100%;max-width:560px;margin:0 auto;background:#fff;
+      border:1px solid var(--line);border-radius:18px;overflow:hidden;
+      box-shadow:var(--shadow);
+    }
+
+    .head{
+      padding:18px 20px;
+      background: linear-gradient(135deg, rgba(183,28,28,.14), rgba(183,28,28,.03));
+      border-bottom:1px solid var(--line);
+    }
+    .head-inner{display:flex;align-items:center;gap:12px;}
+    .logo{
+      width:44px;height:44px;border-radius:12px;background:#fff;
+      border:1px solid var(--line);overflow:hidden;
+      display:flex;align-items:center;justify-content:center;
+    }
+    .logo img{width:100%;height:100%;object-fit:contain;display:block;}
+    .title{margin:0;font-weight:900;font-size:18px;line-height:1.6;}
+    .subtitle{margin:2px 0 0;color:var(--muted);font-size:13px;line-height:1.8;}
+
+    .body{padding:18px 20px 22px;}
+
+    .lead{
+      margin:0 0 10px;
+      font-size:14px;
+      line-height:1.9;
+      color:var(--text);
+    }
+    .muted{
+      margin:0 0 14px;
+      font-size:13px;
+      line-height:1.9;
+      color:var(--muted);
+    }
+
+    .alert{
+      background:var(--paper);
+      border:1px dashed rgba(183,28,28,.35);
+      border-radius:14px;
+      padding:12px 14px;
+      margin:14px 0;
+      color:var(--muted);
+      font-size:13px;
+      line-height:1.9;
+    }
+
+    .otp-box{
+      margin:14px 0 6px;
+      background:rgba(183,28,28,.06);
+      border:1px solid rgba(183,28,28,.18);
+      border-radius:14px;
+      padding:14px;
+      text-align:center;
+    }
+    .otp-label{
+      margin:0 0 8px;
+      font-size:12px;
+      color:#7c2d2d;
+      line-height:1.8;
+      font-weight:800;
+    }
+    .otp{
+      display:inline-block;
+      background:#fff;
+      border:1px solid rgba(183,28,28,.25);
+      border-radius:12px;
+      padding:10px 14px;
+      font-size:28px;
+      font-weight:900;
+      letter-spacing:6px;
+      color:var(--red);
+      line-height:1.2;
+      direction:ltr; /* الأرقام أفضل LTR */
+    }
+    .ttl{
+      margin:10px 0 0;
+      font-size:13px;
+      color:var(--muted);
+      line-height:1.9;
+    }
+
+    .tips{
+      margin:14px 0 0;
+      background:var(--soft);
+      border:1px solid var(--line);
+      border-radius:14px;
+      padding:12px 14px;
+      font-size:13px;
+      color:var(--muted);
+      line-height:1.9;
+    }
+    .tips ul{margin:8px 0 0;padding:0 18px;}
+    .tips li{margin:6px 0;}
+
+    .cta-wrap{margin:14px 0 0;text-align:center;}
+    .btn{
+      display:inline-block;
+      background:var(--red);
+      color:#fff;
+      text-decoration:none;
+      padding:11px 16px;
+      border-radius:12px;
+      font-weight:900;
+      font-size:13px;
+    }
+    .btn:hover{background:var(--red-dark);}
+
+    .foot{
+      padding:14px 20px;
+      border-top:1px solid var(--line);
+      background:#fbfbfd;
+      color:#64748b;
+      font-size:12px;
+      line-height:1.9;
+      text-align:center;
+    }
+    .small{display:block;margin-top:6px;color:#94a3b8;font-size:12px;line-height:1.9;}
+  </style>
+</head>
+
+<body>
+  <div class="wrap">
+    <div class="card">
+
+      <div class="head">
+        <div class="head-inner">
+          <div class="logo">
+            <!-- مرّر logo_url كرابط مطلق من السيرفر -->
+            <img src="{{ logo_url }}" alt="ثقف" />
+          </div>
+          <div>
+            <p class="title">رمز التحقق لتسجيل الدخول</p>
+            <p class="subtitle">منصة ثقف — تصرف سريع ينقذ حياة</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="body">
+        <p class="lead">مرحبًا {{ user_name|default:"بك" }}،</p>
+        <p class="muted">
+          تم استلام طلب لتسجيل الدخول إلى منصة <b>ثقف</b>. لإكمال العملية، استخدم رمز التحقق التالي:
+        </p>
+
+        <div class="otp-box">
+          <p class="otp-label">رمز التحقق (OTP)</p>
+          <div class="otp">{{ otp_code }}</div>
+          <p class="ttl">صلاحية الرمز: <b>{{ ttl_minutes }}</b> دقائق.</p>
+        </div>
+
+        <div class="alert">
+          إذا لم تكن أنت من حاول تسجيل الدخول، تجاهل هذه الرسالة فورًا وغيّر كلمة المرور.
+        </div>
+
+        <div class="tips">
+          <b>نصائح أمنية:</b>
+          <ul>
+            <li>لا تشارك الرمز مع أي شخص، حتى لو ادعى أنه من الدعم.</li>
+            <li>قد تصل الرسالة إلى (Spam) — أضفنا لجهات الاتصال لتحسين الوصول.</li>
+            <li>هذا الرمز صالح للاستخدام مرة واحدة فقط.</li>
+          </ul>
+        </div>
+
+        {% if support_email %}
+          <div class="muted" style="margin-top:14px;">
+            تحتاج مساعدة؟ تواصل معنا: <b>{{ support_email }}</b>
+          </div>
+        {% endif %}
+      </div>
+
+      <div class="foot">
+        © {{ year }} منصة ثقف — جميع الحقوق محفوظة
+        <span class="small">هذه رسالة تلقائية، يرجى عدم الرد عليها.</span>
+      </div>
+
+    </div>
+  </div>
+</body>
+</html>
