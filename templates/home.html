@@ -22,20 +22,11 @@
     }
 
     *{ box-sizing:border-box; }
-    body{
-      margin:0;
-      font-family:"Tajawal",sans-serif;
-      background:#fff;
-      color:var(--text);
-    }
+    body{ margin:0; font-family:"Tajawal",sans-serif; background:#fff; color:var(--text); }
     a{ color:inherit; text-decoration:none; }
     img{ max-width:100%; display:block; }
 
-    .wrap{
-      max-width:1200px;
-      margin:auto;
-      padding:0 18px;
-    }
+    .wrap{ max-width:1200px; margin:auto; padding:0 18px; }
 
     /* ================= HEADER ================= */
     .site-header{
@@ -52,12 +43,7 @@
       gap:16px;
       padding:14px 0;
     }
-    .brand{
-      display:flex;
-      align-items:center;
-      gap:12px;
-      flex:0 0 auto;
-    }
+    .brand{ display:flex; align-items:center; gap:12px; flex:0 0 auto; }
     .brand-logo{
       width:120px;height:100px;
       overflow:hidden;
@@ -65,11 +51,8 @@
       place-items:center;
       flex:0 0 auto;
     }
-    .brand-logo img{
-      width:100%;
-      height:100%;
-      object-fit:contain;
-    }
+    .brand-logo img{ width:100%; height:100%; object-fit:contain; }
+
     .nav{
       flex:1 1 auto;
       display:flex;
@@ -108,18 +91,36 @@
       justify-content:center;
       white-space:nowrap;
     }
-    .btn.red{
-      background:var(--red);
-      color:#fff;
-      border-color:var(--red);
-    }
+    .btn.red{ background:var(--red); color:#fff; border-color:var(--red); }
     .btn.red:hover{ background:var(--red-dark); border-color:var(--red-dark); }
-    .lang{
-      font-weight:800;
-      padding:10px 12px;
-      border-radius:12px;
-    }
+
+    .lang{ font-weight:800; padding:10px 12px; border-radius:12px; }
     .lang:hover{ background:var(--soft); }
+
+    /* ✅ اسم المستخدم بشكل صغير واحترافي */
+    .user-pill{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:9px 12px;
+      border-radius:999px;
+      border:1px solid var(--line);
+      background:linear-gradient(180deg,#fff,var(--paper));
+      font-weight:900;
+      color:#111827;
+      box-shadow:0 8px 18px rgba(0,0,0,.06);
+      max-width:260px;
+      overflow:hidden;
+      text-overflow:ellipsis;
+      white-space:nowrap;
+    }
+    .user-dot{
+      width:10px;height:10px;border-radius:999px;
+      background:rgba(16,185,129,.95);
+      box-shadow:0 0 0 4px rgba(16,185,129,.12);
+      flex:0 0 auto;
+    }
+    .user-name{ font-size:13px; font-weight:900; }
 
     .burger{
       display:none;
@@ -134,27 +135,21 @@
     }
     .burger::before{
       content:"";
-      width:22px;
-      height:2px;
+      width:22px; height:2px;
       background:#111;
       position:absolute;
-      left:50%;
-      top:50%;
+      left:50%; top:50%;
       transform:translate(-50%,-50%);
       box-shadow: 0 -7px 0 #111, 0 7px 0 #111;
       transition:.2s ease;
     }
-    .burger.is-open::before{
-      box-shadow:none;
-      transform:translate(-50%,-50%) rotate(45deg);
-    }
+    .burger.is-open::before{ box-shadow:none; transform:translate(-50%,-50%) rotate(45deg); }
     .burger.is-open::after{
       content:"";
       width:22px;height:2px;
       background:#111;
       position:absolute;
-      left:50%;
-      top:50%;
+      left:50%; top:50%;
       transform:translate(-50%,-50%) rotate(-45deg);
     }
 
@@ -201,6 +196,14 @@
       font-size:18px;
       font-weight:900;
     }
+    .m-user{
+      width:min(520px, 92%);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap:10px;
+      direction:rtl;
+    }
 
     /* ================= LANDING ================= */
     main{ background:#fff; }
@@ -217,15 +220,6 @@
       grid-template-columns: 1.2fr .9fr;
       gap:22px;
       align-items:center;
-    }
-    .badge{
-      display:inline-flex;
-      padding:8px 12px;
-      border:1px solid var(--line);
-      border-radius:999px;
-      background:#fff;
-      font-weight:900;
-      box-shadow:0 6px 14px rgba(0,0,0,.05);
     }
     .hero-title{
       margin:14px 0 10px;
@@ -325,11 +319,7 @@
       padding:40px 0 24px;
       margin-top:40px;
     }
-    .footer-grid{
-      display:grid;
-      grid-template-columns:repeat(4,1fr);
-      gap:20px;
-    }
+    .footer-grid{ display:grid; grid-template-columns:repeat(4,1fr); gap:20px; }
     .footer-box{
       background:rgba(255,255,255,.08);
       border:1px solid rgba(255,255,255,.18);
@@ -339,8 +329,7 @@
     .footer-box h4{ margin:0 0 12px; font-size:16px; font-weight:900; }
     .footer-box ul{
       list-style:none;
-      margin:0;
-      padding:0;
+      margin:0; padding:0;
       display:flex;
       flex-direction:column;
       gap:10px;
@@ -371,12 +360,56 @@
     }
 
     html[dir="rtl"] .site-header,
-    html[dir="rtl"] .header-row{
-      direction: rtl !important;
+    html[dir="rtl"] .header-row{ direction: rtl !important; }
+    html[dir="rtl"] .header-row{ flex-direction: row !important; }
+
+    /* ================= WELCOME MODAL ================= */
+    .modal-backdrop{
+      position:fixed;
+      inset:0;
+      background:rgba(15,23,42,.55);
+      display:none;
+      align-items:center;
+      justify-content:center;
+      padding:18px;
+      z-index:2000;
     }
-    html[dir="rtl"] .header-row{
-      flex-direction: row !important;
+    .modal-backdrop.show{ display:flex; }
+    .modal{
+      width:min(520px, 100%);
+      background:#fff;
+      border-radius:18px;
+      border:1px solid rgba(255,255,255,.35);
+      box-shadow:0 18px 50px rgba(0,0,0,.22);
+      overflow:hidden;
+      transform:translateY(6px);
+      animation:pop .22s ease forwards;
     }
+    @keyframes pop{
+      from{ opacity:.6; transform:translateY(10px) scale(.99); }
+      to{ opacity:1; transform:translateY(0) scale(1); }
+    }
+    .modal-top{
+      padding:16px 16px 12px;
+      background:
+        radial-gradient(700px 220px at 15% 0%, #b71c1c18, transparent 60%),
+        linear-gradient(180deg,#fff,var(--paper));
+      border-bottom:1px solid var(--line);
+    }
+    .modal-title{ margin:0; font-size:18px; font-weight:900; color:#111827; }
+    .modal-body{
+      padding:14px 16px 16px;
+      color:var(--muted);
+      font-weight:800;
+      line-height:1.9;
+    }
+    .modal-actions{
+      padding:0 16px 16px;
+      display:flex;
+      gap:10px;
+      justify-content:flex-end;
+    }
+    .modal-actions .btn{ height:44px; border-radius:12px; }
   </style>
 </head>
 
@@ -386,24 +419,40 @@
   <div class="wrap">
     <div class="header-row">
 
-      <a class="brand" href="/" aria-label="العودة للرئيسية">
+      <a class="brand" href="{% url 'home' %}" aria-label="العودة للرئيسية">
         <div class="brand-logo">
           <img src="{% static 'assets/img/logothqaf.png' %}" alt="شعار ثقف">
-                  <span style="font-size: 20px; color:#111827;">تصرف سريع تــنـــقــذ حـــيــــاة</span>
-
+          <span style="font-size: 20px; color:#111827;">تصرف سريع تــنـــقــذ حـــيــــاة</span>
         </div>
       </a>
 
       <nav class="nav" aria-label="القائمة الرئيسية">
-        <a href="/" class="active">الصفحة الرئيسية</a>
+        <a href="{% url 'home' %}" class="active">الصفحة الرئيسية</a>
         <a href="/courses/">الدورات</a>
         <a href="/support/">الأسئلة الشائعة</a>
-        <a href="/contact/">تواصل معنا</a>
+        <a href="{% url 'contact' %}">تواصل معنا</a>
       </nav>
 
       <div class="actions">
         <a class="lang" href="#">English</a>
-        <a class="btn red" href="{% url 'accounts:register' %}">إنشاء حساب</a>
+
+        {% if user.is_authenticated %}
+          <span class="user-pill" title="{{ user.email }}">
+            <span class="user-dot" aria-hidden="true"></span>
+            <span class="user-name">
+              {{ request.session.display_name|default:user.email }}
+            </span>
+          </span>
+
+          <!-- ✅ Logout POST (يحـل 405) -->
+          <form method="post" action="{% url 'accounts:logout' %}" style="display:inline;margin:0;">
+            {% csrf_token %}
+            <button class="btn" type="submit">تسجيل الخروج</button>
+          </form>
+        {% else %}
+          <a class="btn" href="{% url 'accounts:login' %}">تسجيل دخول</a>
+          <a class="btn red" href="{% url 'accounts:register' %}">إنشاء حساب</a>
+        {% endif %}
       </div>
 
       <button class="burger" id="burger" type="button" aria-label="القائمة" aria-expanded="false"></button>
@@ -415,15 +464,32 @@
     <div class="wrap">
       <div class="mobile-inner">
         <div class="m-links">
-  <a href="/" class="active">الصفحة الرئيسية</a>
-  <a href="/courses/">الدورات</a>
-  <a href="/support/">الأسئلة الشائعة</a>
-  <a href="{% url 'contact' %}">تواصل معنا</a>
-</div>
+          <a href="{% url 'home' %}" class="active">الصفحة الرئيسية</a>
+          <a href="/courses/">الدورات</a>
+          <a href="/support/">الأسئلة الشائعة</a>
+          <a href="{% url 'contact' %}">تواصل معنا</a>
+        </div>
 
         <div class="m-bottom">
           <a class="m-lang" href="#">English</a>
-          <a class="btn red" href="{% url 'accounts:register' %}">إنشاء حساب</a>
+
+          {% if user.is_authenticated %}
+            <div class="m-user">
+              <span class="user-pill" style="width:100%;justify-content:center;">
+                <span class="user-dot" aria-hidden="true"></span>
+                <span class="user-name">{{ request.session.display_name|default:user.email }}</span>
+              </span>
+            </div>
+
+            <!-- ✅ Logout POST في الجوال -->
+            <form method="post" action="{% url 'accounts:logout' %}" style="width:min(520px,92%);margin:0;">
+              {% csrf_token %}
+              <button class="btn m-login" type="submit">تسجيل الخروج</button>
+            </form>
+          {% else %}
+            <a class="btn m-login" href="{% url 'accounts:login' %}">تسجيل دخول</a>
+            <a class="btn red m-login" href="{% url 'accounts:register' %}">إنشاء حساب</a>
+          {% endif %}
         </div>
       </div>
     </div>
@@ -432,25 +498,22 @@
 
 <main>
 
-  <!-- ✅ صفحة الهبوط داخل الهوم -->
   <section class="hero">
     <div class="wrap hero-grid">
 
       <div class="hero-copy">
-
         <h1 class="hero-title">
-            معرفة بسيطة، تصرف سريع
-        <span class="hl">تنقذ حياة</span>
+          معرفة بسيطة، تصرف سريع
+          <span class="hl">تنقذ حياة</span>
         </h1>
 
-        <p class="hero-desc">
-            بوابة الدخول الموحد للأفراد والجهات
-        </p>
+        <p class="hero-desc">بوابة الدخول الموحد للأفراد والجهات</p>
 
         <div class="hero-actions">
           <a class="cta primary" href="/courses/">استعراض الدورات</a>
-          <a class="cta red" href="{% url 'accounts:login' %}">تسجيل دخول</a>
-
+          {% if not user.is_authenticated %}
+            <a class="cta red" href="{% url 'accounts:login' %}">تسجيل دخول</a>
+          {% endif %}
         </div>
 
         <div class="stats">
@@ -532,7 +595,7 @@
       <div class="footer-box">
         <h4>تصفح</h4>
         <ul>
-          <li><a href="/">الرئيسية</a></li>
+          <li><a href="{% url 'home' %}">الرئيسية</a></li>
           <li><a href="/courses/">الدورات</a></li>
         </ul>
       </div>
@@ -541,7 +604,7 @@
         <h4>الدعم</h4>
         <ul>
           <li><a href="/support/">الأسئلة الشائعة</a></li>
-          <li><a href="/contact/">تواصل معنا</a></li>
+          <li><a href="{% url 'contact' %}">تواصل معنا</a></li>
         </ul>
       </div>
 
@@ -554,13 +617,30 @@
       </div>
     </div>
 
-    <div class="footer-bottom">
-      جميع الحقوق محفوظة © 2026
-    </div>
+    <div class="footer-bottom">جميع الحقوق محفوظة © 2026</div>
   </div>
 </footer>
 
+<!-- ✅ مودال الترحيب (حسب السيشن من الباك اند) -->
+{% if request.session.show_welcome_modal %}
+  <div class="modal-backdrop" id="welcomeBackdrop" role="dialog" aria-modal="true" aria-labelledby="welcomeTitle">
+    <div class="modal">
+      <div class="modal-top">
+        <h3 class="modal-title" id="welcomeTitle">مرحباً بك 👋</h3>
+      </div>
+      <div class="modal-body">
+        سعيدين بانضمامك يا
+        <span style="color:#111827;font-weight:900;">{{ request.session.welcome_name }}</span>.
+      </div>
+      <div class="modal-actions">
+        <button class="btn" type="button" id="welcomeOkBtn">حسناً</button>
+      </div>
+    </div>
+  </div>
+{% endif %}
+
 <script>
+  // Burger
   (function(){
     const burger = document.getElementById("burger");
     const menu   = document.getElementById("mobileMenu");
@@ -586,6 +666,48 @@
     window.addEventListener("resize", function(){
       if(window.innerWidth > 900) closeMenu();
     });
+  })();
+
+  // CSRF helper
+  function getCookie(name) {
+    const value = `; ${document.cookie}`;
+    const parts = value.split(`; ${name}=`);
+    if (parts.length === 2) return parts.pop().split(';').shift();
+    return "";
+  }
+
+  // Welcome modal once
+  (function(){
+    const backdrop = document.getElementById("welcomeBackdrop");
+    if(!backdrop) return;
+
+    const okBtn = document.getElementById("welcomeOkBtn");
+
+    function clearWelcomeFlag(){
+      fetch("{% url 'accounts:welcome_clear' %}", {
+        method: "POST",
+        headers: {"X-CSRFToken": getCookie("csrftoken")},
+        credentials: "same-origin"
+      }).catch(() => {});
+    }
+
+    function closeModal(){
+      backdrop.classList.remove("show");
+    }
+
+    backdrop.classList.add("show");
+    clearWelcomeFlag();
+
+    const t = setTimeout(function(){
+      closeModal();
+    }, 1600);
+
+    if(okBtn){
+      okBtn.addEventListener("click", function(){
+        clearTimeout(t);
+        closeModal();
+      });
+    }
   })();
 </script>
 
