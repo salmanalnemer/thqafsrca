@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <title>تفعيل حسابك</title>
+</head>
+<body style="margin:0;font-family:Tajawal,Arial,sans-serif;background:#f6f7f9;color:#0f172a;">
+
+  <div style="max-width:600px;margin:30px auto;background:#ffffff;border-radius:16px;overflow:hidden;border:1px solid #e5e7eb">
+
+    <!-- Header -->
+    <div style="padding:24px;text-align:center;background:#ffffff;border-bottom:1px solid #e5e7eb">
+      <img src="{{ logo_url }}" alt="ثقف" style="height:64px;margin-bottom:10px;">
+      <h2 style="margin:0;font-weight:900;">بوابة ثقف</h2>
+      <p style="margin:6px 0 0;font-weight:700;color:#475569;">
+        تصرف سريع ينقذ حياة
+      </p>
+    </div>
+
+    <!-- Body -->
+    <div style="padding:24px;line-height:1.9">
+
+      <p style="font-weight:800;">
+        أهلًا {{ user_name|default:"بك" }}،
+      </p>
+
+      <p>
+        سعدنا بانضمامك إلى <b>بوابة ثقف</b>، المنصة المخصصة
+        <b>لتعلم أساسيات الإسعافات الأولية، إدارة الدورات، وربط الأفراد والجهات</b>
+        في بيئة رقمية موثوقة.
+      </p>
+
+      <p>
+        لتفعيل حسابك، استخدم رمز التحقق التالي:
+      </p>
+
+      <!-- OTP -->
+      <div style="text-align:center;margin:20px 0">
+        <span style="
+          display:inline-block;
+          padding:14px 26px;
+          font-size:26px;
+          font-weight:900;
+          letter-spacing:4px;
+          background:#f6f7f9;
+          border:1px dashed #B71C1C;
+          border-radius:12px;
+          color:#B71C1C;">
+          {{ otp_code }}
+        </span>
+      </div>
+
+      <p style="font-size:14px;color:#475569;font-weight:700;">
+        الرمز صالح لمدة <b>{{ ttl_minutes }} دقائق</b>.
+        في حال لم تقم بطلب التسجيل، يمكنك تجاهل هذه الرسالة.
+      </p>
+
+      <hr style="border:none;border-top:1px solid #e5e7eb;margin:24px 0">
+
+      <!-- Soft Promotion -->
+      <p style="font-weight:800;margin-bottom:6px;">ماذا يقدم لك ثقف؟</p>
+      <ul style="padding:0 18px;margin:0;color:#475569;font-weight:700;">
+        <li>دورات إسعافات أولية معتمدة</li>
+        <li>إدارة تسجيل وحضور المتدربين</li>
+        <li>لوحات متابعة للأفراد والجهات</li>
+        <li>بيئة آمنة ومتوافقة مع الأنظمة</li>
+      </ul>
+
+    </div>
+
+    <!-- Footer -->
+    <div style="background:#B71C1C;color:#ffffff;padding:18px;text-align:center;font-size:13px;font-weight:700;">
+      جميع الحقوق محفوظة © {{ year }} | بوابة ثقف  
+      <br>
+      هذا البريد مرسل آليًا، الرجاء عدم الرد عليه
+    </div>
+
+  </div>
+
+</body>
+</html>

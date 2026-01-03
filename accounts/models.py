@@ -2,11 +2,12 @@ from __future__ import annotations
 
 import secrets
 from datetime import timedelta
-
 from django.contrib.auth.models import AbstractUser, BaseUserManager
 from django.core.validators import RegexValidator
 from django.db import models
 from django.utils import timezone
+from django.conf import settings
+
 
 
 class UserManager(BaseUserManager):
@@ -210,3 +211,39 @@ class EmailOTP(models.Model):
 
     def __str__(self):
         return f"OTP {self.email} ({self.purpose})"
+
+class IndividualProfile(models.Model):
+    user = models.OneToOneField(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="individual_profile",
+    )
+    full_name = models.CharField(max_length=200, verbose_name="الاسم الكامل")
+    national_id = models.CharField(max_length=20, db_index=True, verbose_name="رقم الهوية")
+    is_affiliated = models.BooleanField(default=False, verbose_name="تابع لجهة؟")
+
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.full_name
+
+
+class OrganizationProfile(models.Model):
+    user = models.OneToOneField(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="organization_profile",
+    )
+    organization_name = models.CharField(max_length=255, verbose_name="اسم الجهة")
+    representative_name = models.CharField(max_length=255, verbose_name="اسم ممثل الجهة")
+
+    # موقع بالخريطة
+    latitude = models.DecimalField(max_digits=10, decimal_places=7, null=True, blank=True)
+    longitude = models.DecimalField(max_digits=10, decimal_places=7, null=True, blank=True)
+
+    landmark = models.CharField(max_length=255, blank=True, verbose_name="إضافة معلم")
+
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.organization_name

@@ -9,7 +9,6 @@ from django.conf.urls.static import static
 urlpatterns = [
     # صفحة الهبوط (الرئيسية) - الأفضل تكون home.html وليس base.html
     path("", TemplateView.as_view(template_name="home.html"), name="home"),
-
     path("admin/", admin.site.urls),
 
     path("accounts/", include("accounts.urls")),
@@ -20,6 +19,7 @@ urlpatterns = [
     path("attendance/", include("attendance.urls")),
     path("certificates/", include("certificates.urls")),
     path("support/", include("support.urls")),
+    path("contact/", include("contact.urls")),
 ]
 
 # ✅ تفعيل خدمة ملفات static/media أثناء التطوير فقط (DEBUG=True)

@@ -1,0 +1,1039 @@
+{% load static %}
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <title>إنشاء حساب</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+
+  <!-- ✅ بحث داخل الخريطة (Geocoder) -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder@2.4.0/dist/Control.Geocoder.css">
+
+  <style>
+    :root{
+      --red:#B71C1C;
+      --red-dark:#8e1414;
+      --text:#0f172a;
+      --muted:#475569;
+      --line:#e5e7eb;
+      --soft:#f6f7f9;
+      --paper:#fbfaf7;
+      --radius:14px;
+      --shadow:0 10px 24px rgba(0,0,0,.10);
+    }
+
+    *{ box-sizing:border-box; }
+    body{
+      margin:0;
+      font-family:"Tajawal",sans-serif;
+      background:#fff;
+      color:var(--text);
+    }
+    a{ color:inherit; text-decoration:none; }
+    img{ max-width:100%; display:block; }
+
+    .wrap{ max-width:1200px; margin:auto; padding:0 18px; }
+
+    /* ================= HEADER ================= */
+    .site-header{
+      background:#fff;
+      border-bottom:1px solid var(--line);
+      position:sticky;
+      top:0;
+      z-index:1000;
+    }
+    .header-row{
+      direction:rtl;
+      display:flex;
+      align-items:center;
+      gap:16px;
+      padding:14px 0;
+    }
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:12px;
+      flex:0 0 auto;
+    }
+    .brand-logo{
+      width:120px;height:100px;
+      overflow:hidden;
+      display:grid;
+      place-items:center;
+      flex:0 0 auto;
+    }
+    .brand-logo img{
+      width:100%;
+      height:100%;
+      object-fit:contain;
+    }
+    .nav{
+      flex:1 1 auto;
+      display:flex;
+      gap:8px;
+      align-items:center;
+      justify-content:center;
+    }
+    .nav a{
+      padding:10px 14px;
+      border-radius:12px;
+      font-weight:800;
+      transition:.2s ease;
+      color:#111827;
+      white-space:nowrap;
+    }
+    .nav a:hover{ background:var(--soft); }
+    .nav a.active{ background:#00000010; }
+
+    .actions{
+      flex:0 0 auto;
+      display:flex;
+      align-items:center;
+      gap:10px;
+      margin-right:auto;
+    }
+    .btn{
+      padding:10px 14px;
+      border-radius:12px;
+      border:1px solid var(--line);
+      font-weight:900;
+      background:#fff;
+      cursor:pointer;
+      transition:.2s ease;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      white-space:nowrap;
+    }
+    .btn.red{
+      background:var(--red);
+      color:#fff;
+      border-color:var(--red);
+    }
+    .btn.red:hover{ background:var(--red-dark); border-color:var(--red-dark); }
+    .lang{
+      font-weight:800;
+      padding:10px 12px;
+      border-radius:12px;
+    }
+    .lang:hover{ background:var(--soft); }
+
+    .burger{
+      display:none;
+      width:44px;height:44px;
+      border-radius:12px;
+      border:1px solid var(--line);
+      background:#fff;
+      cursor:pointer;
+      font-size:0;
+      position:relative;
+      margin-right:auto;
+    }
+    .burger::before{
+      content:"";
+      width:22px;
+      height:2px;
+      background:#111;
+      position:absolute;
+      left:50%;
+      top:50%;
+      transform:translate(-50%,-50%);
+      box-shadow: 0 -7px 0 #111, 0 7px 0 #111;
+      transition:.2s ease;
+    }
+    .burger.is-open::before{
+      box-shadow:none;
+      transform:translate(-50%,-50%) rotate(45deg);
+    }
+    .burger.is-open::after{
+      content:"";
+      width:22px;height:2px;
+      background:#111;
+      position:absolute;
+      left:50%;
+      top:50%;
+      transform:translate(-50%,-50%) rotate(-45deg);
+    }
+
+    /* ================= MOBILE MENU ================= */
+    .mobile-menu{
+      display:none;
+      border-top:1px solid var(--line);
+      background:var(--paper);
+    }
+    .mobile-menu.open{ display:block; }
+    .mobile-inner{ padding:18px 0; }
+
+    .m-links{
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      gap:18px;
+      padding:10px 0 18px;
+      border-bottom:1px solid #e7e5e1;
+      direction:rtl;
+    }
+    .m-links a{
+      font-size:18px;
+      font-weight:700;
+      color:#111827;
+      padding:8px 14px;
+      border-radius:12px;
+    }
+    .m-links a:hover{ background:#ffffff80; }
+
+    .m-bottom{
+      padding:16px 0 6px;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      gap:14px;
+      direction:ltr;
+    }
+    .m-bottom .m-lang{ font-weight:800; color:#111827; }
+    .m-bottom .m-login{
+      width:min(520px, 92%);
+      height:54px;
+      border-radius:12px;
+      font-size:18px;
+      font-weight:900;
+    }
+
+    /* ================= MAIN CENTER ================= */
+    main{
+      background:
+        radial-gradient(1200px 400px at 15% 0%, #b71c1c12, transparent 60%),
+        linear-gradient(180deg,#fff,var(--paper));
+      padding:26px 0 10px;
+      min-height: calc(100vh - 140px);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+    }
+
+    .page-shell{
+      width:100%;
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 0 14px;
+    }
+
+    .page-head{
+      margin:0 0 6px;
+      font-size:28px;
+      font-weight:900;
+      text-align:center;
+    }
+    .page-desc{
+      margin:0 0 14px;
+      color:var(--muted);
+      font-weight:700;
+      line-height:1.9;
+      text-align:center;
+    }
+
+    .choose{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:12px;
+      margin:14px 0;
+    }
+    @media (max-width: 720px){ .choose{ grid-template-columns:1fr; } }
+
+    .pick{
+      border:1px solid var(--line);
+      border-radius:16px;
+      padding:14px;
+      background:#fff;
+      cursor:pointer;
+      transition:.15s;
+      box-shadow:0 10px 20px rgba(0,0,0,.05);
+      text-align:right;
+    }
+    .pick:hover{ transform:translateY(-1px); }
+    .pick.active{
+      border-color:var(--red);
+      box-shadow:0 12px 26px rgba(183,28,28,.12);
+    }
+    .pick h3{ margin:0 0 6px; font-weight:900; }
+    .pick p{ margin:0; color:var(--muted); font-weight:700; line-height:1.8; }
+
+    .card{
+      background:#fff;
+      border:1px solid var(--line);
+      border-radius:18px;
+      box-shadow:0 10px 24px rgba(0,0,0,.08);
+      padding:18px;
+      width:100%;
+      margin: 0 auto;
+    }
+
+    label{ display:block; font-weight:900; margin:10px 0 6px; }
+    input,select,textarea{
+      width:100%;
+      padding:12px;
+      border:1px solid var(--line);
+      border-radius:12px;
+      font-family:inherit;
+      font-size:14px;
+      outline:none;
+      background:#fff;
+    }
+    textarea{ min-height:110px; resize:vertical; }
+
+    .row2{ display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+    @media (max-width: 720px){ .row2{ grid-template-columns:1fr; } }
+
+    .btn-main{
+      margin-top:12px;
+      height:48px;
+      padding:0 16px;
+      border-radius:12px;
+      border:1px solid var(--red);
+      background:var(--red);
+      color:#fff;
+      font-weight:900;
+      cursor:pointer;
+      width:100%;
+      transition:.2s ease;
+    }
+    .btn-main:hover{ background:var(--red-dark); border-color:var(--red-dark); }
+
+    .hint{
+      margin-top:10px;
+      color:var(--muted);
+      font-weight:800;
+      text-align:center;
+    }
+    .hint a{ color:var(--red); font-weight:900; }
+
+    .msg{ margin:10px 0 0; padding:10px 12px; border-radius:12px; font-weight:900; border:1px solid; }
+    .msg.err{ background:#fee2e2; color:#7f1d1d; border-color:#fecaca; }
+    .msg.ok{ background:#dcfce7; color:#14532d; border-color:#bbf7d0; }
+
+    .hide{ display:none !important; }
+
+    #map{
+      height:320px;
+      border-radius:14px;
+      border:1px solid var(--line);
+      overflow:hidden;
+    }
+
+    /* ✅ سويتش "تابع لجهة؟" */
+    .toggle-row{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:14px;
+      padding:12px 12px;
+      margin-top:10px;
+      border:1px solid var(--line);
+      border-radius:14px;
+      background:linear-gradient(180deg,#fff,var(--paper));
+    }
+    .toggle-title{ font-weight:900; margin-bottom:2px; }
+    .toggle-sub{
+      color:var(--muted);
+      font-weight:800;
+      font-size:13px;
+      line-height:1.7;
+    }
+
+    .switch{
+      position:relative;
+      width:58px;
+      height:34px;
+      flex:0 0 auto;
+    }
+    .switch input{ opacity:0; width:0; height:0; }
+    .slider{
+      position:absolute;
+      cursor:pointer;
+      inset:0;
+      background:#e5e7eb;
+      border-radius:999px;
+      transition:.2s ease;
+      border:1px solid #d1d5db;
+    }
+    .slider::before{
+      content:"";
+      position:absolute;
+      height:26px;
+      width:26px;
+      left:4px;
+      top:50%;
+      transform:translateY(-50%);
+      background:#fff;
+      border-radius:999px;
+      box-shadow:0 6px 14px rgba(0,0,0,.12);
+      transition:.2s ease;
+    }
+    .switch input:checked + .slider{
+      background:rgba(183,28,28,.16);
+      border-color:rgba(183,28,28,.35);
+    }
+    .switch input:checked + .slider::before{
+      transform:translate(24px,-50%);
+    }
+
+    /* ✅ انيميشن ظهور/إخفاء قائمة الجهة */
+    .collapse{
+      max-height:0;
+      overflow:hidden;
+      opacity:0;
+      transform:translateY(-4px);
+      transition:.22s ease;
+    }
+    .collapse.open{
+      max-height:220px;
+      opacity:1;
+      transform:translateY(0);
+      margin-top:10px;
+    }
+
+    /* ✅ شريط معلومات العنوان */
+    .addr{
+      margin-top:10px;
+      padding:10px 12px;
+      border:1px solid var(--line);
+      border-radius:14px;
+      background:#fff;
+      font-weight:900;
+      color:#111827;
+      line-height:1.8;
+    }
+    .addr small{
+      display:block;
+      color:var(--muted);
+      font-weight:800;
+      margin-top:4px;
+    }
+
+    /* ================= FOOTER ================= */
+    .site-footer{
+      background:linear-gradient(180deg,var(--red),#7a0f0f);
+      color:#fff;
+      padding:40px 0 24px;
+      margin-top:0;
+    }
+    .footer-grid{
+      display:grid;
+      grid-template-columns:repeat(4,1fr);
+      gap:20px;
+    }
+    .footer-box{
+      background:rgba(255,255,255,.08);
+      border:1px solid rgba(255,255,255,.18);
+      border-radius:16px;
+      padding:16px;
+    }
+    .footer-box h4{ margin:0 0 12px; font-size:16px; font-weight:900; }
+    .footer-box ul{
+      list-style:none;
+      margin:0;
+      padding:0;
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+      font-weight:700;
+    }
+    .footer-bottom{
+      margin-top:20px;
+      text-align:center;
+      font-weight:700;
+      opacity:.95;
+    }
+
+    @media (max-width: 900px){
+      .nav{ display:none; }
+      .actions{ display:none; }
+      .burger{ display:inline-block; }
+      .header-row{ padding:10px 0; }
+      .footer-grid{ grid-template-columns:1fr; }
+    }
+
+    @media (max-height: 760px){
+      main{ align-items:flex-start; }
+      .page-shell{ padding-top: 14px; padding-bottom: 14px; }
+    }
+
+    html[dir="rtl"] .site-header,
+    html[dir="rtl"] .header-row{ direction: rtl !important; }
+    html[dir="rtl"] .header-row{ flex-direction: row !important; }
+  </style>
+</head>
+
+<body>
+
+<header class="site-header">
+  <div class="wrap">
+    <div class="header-row">
+
+      <a class="brand" href="{% url 'home' %}" aria-label="العودة للرئيسية">
+        <div class="brand-logo">
+          <img src="{% static 'assets/img/logothqaf.png' %}" alt="شعار ثقف">
+                  <span style="font-size: 20px; color:#111827;">تصرف سريع تــنـــقــذ حـــيــــاة</span>
+        </div>
+      </a>
+
+      <nav class="nav" aria-label="القائمة الرئيسية">
+        <a href="{% url 'home' %}">الصفحة الرئيسية</a>
+        <a href="/courses/">الدورات</a>
+        <a href="/support/">الأسئلة الشائعة</a>
+        <a href="{% url 'contact' %}">تواصل معنا</a>
+      </nav>
+
+      <div class="actions">
+        <a class="lang" href="#">English</a>
+        <a class="btn red" href="{% url 'accounts:register' %}">إنشاء حساب</a>
+      </div>
+
+      <button class="burger" id="burger" type="button" aria-label="القائمة" aria-expanded="false"></button>
+
+    </div>
+  </div>
+
+  <div class="mobile-menu" id="mobileMenu" aria-label="قائمة الجوال">
+    <div class="wrap">
+      <div class="mobile-inner">
+        <div class="m-links">
+          <a href="{% url 'home' %}">الصفحة الرئيسية</a>
+          <a href="/courses/">الدورات</a>
+          <a href="/support/">الأسئلة الشائعة</a>
+          <a href="{% url 'contact' %}">تواصل معنا</a>
+        </div>
+        <div class="m-bottom">
+          <a class="m-lang" href="#">English</a>
+          <a class="btn red m-login" href="{% url 'accounts:register' %}">إنشاء حساب</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main>
+  <div class="page-shell">
+
+    <h1 class="page-head">إنشاء حساب</h1>
+    <p class="page-desc">اختر نوع التسجيل ثم أكمل البيانات. بعد الإرسال سيصلك رمز تفعيل على البريد الإلكتروني.</p>
+
+    {% for message in messages %}
+      {% if message.tags == 'error' %}
+        <div class="msg err">{{ message }}</div>
+      {% else %}
+        <div class="msg ok">{{ message }}</div>
+      {% endif %}
+    {% endfor %}
+
+    <div class="choose">
+      <div class="pick active" id="pickIndividual" role="button" tabindex="0">
+        <h3>تسجيل أفراد</h3>
+        <p>إنشاء حساب للأفراد والمتدربين.</p>
+      </div>
+      <div class="pick" id="pickOrg" role="button" tabindex="0">
+        <h3>تسجيل جهات</h3>
+        <p>اختر المنطقة ثم حدّد موقع الجهة على الخريطة (مع بحث وعنوان واضح).</p>
+      </div>
+    </div>
+
+    <!-- كرت الأفراد -->
+    <div class="card" id="cardIndividual">
+      <h2 style="margin:0 0 10px;font-weight:900;text-align:center;">بيانات الفرد</h2>
+
+      <form method="post" novalidate>
+        {% csrf_token %}
+        <input type="hidden" name="account_type" value="individual">
+
+        <label>الاسم الكامل</label>
+        <input type="text" name="full_name" required>
+
+        <div class="row2">
+          <div>
+            <label>البريد الإلكتروني</label>
+            <input type="email" name="email" required>
+          </div>
+          <div>
+            <label>رقم الجوال</label>
+            <input type="text" name="phone" placeholder="+9665xxxxxxxx" required>
+          </div>
+        </div>
+
+        <div class="row2">
+          <div>
+            <label>رقم الهوية</label>
+            <input type="text" name="national_id" maxlength="10" inputmode="numeric" required>
+          </div>
+          <div>
+            <label>المنطقة</label>
+            <select name="region_id" required>
+              <option value="">اختر المنطقة</option>
+              {% for r in regions %}
+                <option value="{{ r.id }}">{{ r }}</option>
+              {% endfor %}
+            </select>
+          </div>
+        </div>
+
+        <!-- ✅ تابع لجهة؟ بشكل مناسب -->
+        <div class="toggle-row">
+          <div>
+            <div class="toggle-title">تابع لجهة؟</div>
+            <div class="toggle-sub">فعّل الخيار إذا كنت تابعًا لجهة حتى تظهر لك قائمة الجهات.</div>
+          </div>
+
+          <label class="switch" aria-label="تابع لجهة؟">
+            <input type="checkbox" name="is_affiliated" id="isAffiliated">
+            <span class="slider"></span>
+          </label>
+        </div>
+
+        <!-- ✅ قائمة الجهة تظهر بسلاسة -->
+        <div id="orgBranchBox" class="collapse">
+          <label>الجهة / الفرع</label>
+          <select name="org_branch_id">
+            <option value="">اختر الجهة</option>
+            {% for o in org_branches %}
+              <option value="{{ o.id }}">{{ o }}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="row2">
+          <div>
+            <label>كلمة المرور</label>
+            <input type="password" name="password" required>
+          </div>
+          <div>
+            <label>إعادة كلمة المرور</label>
+            <input type="password" name="confirm_password" required>
+          </div>
+        </div>
+
+        <button class="btn-main" type="submit">تسجيل وإرسال رمز التفعيل</button>
+
+        <div class="hint">
+          لديك حساب؟ <a href="{% url 'accounts:login' %}">تسجيل الدخول</a>
+        </div>
+      </form>
+    </div>
+
+    <!-- كرت الجهات -->
+    <div class="card hide" id="cardOrg" style="margin-top:14px">
+      <h2 style="margin:0 0 10px;font-weight:900;text-align:center;">بيانات الجهة</h2>
+
+      <form method="post" novalidate>
+        {% csrf_token %}
+        <input type="hidden" name="account_type" value="org">
+
+        <label>اسم الجهة</label>
+        <input type="text" name="organization_name" required>
+
+        <label>اسم ممثل الجهة</label>
+        <input type="text" name="representative_name" required>
+
+        <div class="row2">
+          <div>
+            <label>البريد الإلكتروني</label>
+            <input type="email" name="email" required>
+          </div>
+          <div>
+            <label>رقم الجوال</label>
+            <input type="text" name="phone" placeholder="+9665xxxxxxxx" required>
+          </div>
+        </div>
+
+        <!-- ✅ اختيار المنطقة للجهات + تحريك الخريطة تلقائياً -->
+        <div class="row2">
+          <div>
+            <label>المنطقة</label>
+            <select name="region_id" id="orgRegion" required>
+              <option value="">اختر المنطقة</option>
+              {% for r in regions %}
+                <option value="{{ r.id }}">{{ r }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div>
+            <label>إضافة معلم</label>
+            <input type="text" name="landmark" placeholder="مثال: بجوار مستشفى..." >
+          </div>
+        </div>
+
+        <label style="margin-top:12px;">الموقع (اختره من الخريطة أو استخدم البحث)</label>
+        <div id="map"></div>
+
+        <!-- ✅ عنوان واضح للنقطة المختارة -->
+        <div class="addr" id="addrBox" style="display:none">
+          <div id="addrText"></div>
+          <small>يمكنك تحريك المؤشر أو الضغط على الخريطة لتغيير الموقع.</small>
+        </div>
+
+        <div class="row2" style="margin-top:10px">
+          <div>
+            <label>Latitude</label>
+            <input type="text" name="latitude" id="lat" readonly required>
+          </div>
+          <div>
+            <label>Longitude</label>
+            <input type="text" name="longitude" id="lng" readonly required>
+          </div>
+        </div>
+
+        <div class="row2">
+          <div>
+            <label>كلمة المرور</label>
+            <input type="password" name="password" required>
+          </div>
+          <div>
+            <label>إعادة كلمة المرور</label>
+            <input type="password" name="confirm_password" required>
+          </div>
+        </div>
+
+        <button class="btn-main" type="submit">تسجيل وإرسال رمز التفعيل</button>
+
+        <div class="hint">
+         لديك حساب؟ <a href="{% url 'accounts:login' %}">تسجيل الدخول</a>
+        </div>
+      </form>
+    </div>
+
+  </div>
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <div class="footer-grid">
+      <div class="footer-box">
+        <h4>عن ثقف</h4>
+        <p style="margin:0;line-height:1.9;font-weight:700;opacity:.95;">
+          منصة رسمية لإدارة الدورات التدريبية والتأهيلية.
+        </p>
+      </div>
+
+      <div class="footer-box">
+        <h4>تصفح</h4>
+        <ul>
+          <li><a href="{% url 'home' %}">الرئيسية</a></li>
+          <li><a href="/courses/">الدورات</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-box">
+        <h4>الدعم</h4>
+        <ul>
+          <li><a href="/support/">الأسئلة الشائعة</a></li>
+          <li><a href="{% url 'contact' %}">تواصل معنا</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-box">
+        <h4>معلومات</h4>
+        <ul>
+          <li>support@thqaf.com</li>
+          <li>19971</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="footer-bottom">
+      جميع الحقوق محفوظة © 2026
+    </div>
+  </div>
+</footer>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<!-- ✅ Geocoder -->
+<script src="https://unpkg.com/leaflet-control-geocoder@2.4.0/dist/Control.Geocoder.js"></script>
+
+<script>
+  // Burger
+  (function(){
+    const burger = document.getElementById("burger");
+    const menu   = document.getElementById("mobileMenu");
+    if(!burger || !menu) return;
+
+    function openMenu(){
+      burger.classList.add("is-open");
+      menu.classList.add("open");
+      burger.setAttribute("aria-expanded", "true");
+    }
+    function closeMenu(){
+      burger.classList.remove("is-open");
+      menu.classList.remove("open");
+      burger.setAttribute("aria-expanded", "false");
+    }
+
+    burger.addEventListener("click", function(){
+      const isOpen = menu.classList.contains("open");
+      if(isOpen) closeMenu();
+      else openMenu();
+    });
+
+    window.addEventListener("resize", function(){
+      if(window.innerWidth > 900) closeMenu();
+    });
+  })();
+
+  // Toggle cards
+  const pickIndividual = document.getElementById("pickIndividual");
+  const pickOrg = document.getElementById("pickOrg");
+  const cardIndividual = document.getElementById("cardIndividual");
+  const cardOrg = document.getElementById("cardOrg");
+
+  function showIndividual(){
+    pickIndividual.classList.add("active");
+    pickOrg.classList.remove("active");
+    cardIndividual.classList.remove("hide");
+    cardOrg.classList.add("hide");
+  }
+  function showOrg(){
+    pickOrg.classList.add("active");
+    pickIndividual.classList.remove("active");
+    cardOrg.classList.remove("hide");
+    cardIndividual.classList.add("hide");
+    setTimeout(initMapOnce, 80);
+  }
+  pickIndividual.addEventListener("click", showIndividual);
+  pickOrg.addEventListener("click", showOrg);
+
+  // ✅ affiliated org select (smooth)
+  const isAffiliated = document.getElementById("isAffiliated");
+  const orgBranchBox = document.getElementById("orgBranchBox");
+  if(isAffiliated && orgBranchBox){
+    const sync = () => {
+      if(isAffiliated.checked) orgBranchBox.classList.add("open");
+      else orgBranchBox.classList.remove("open");
+    };
+    isAffiliated.addEventListener("change", sync);
+    sync();
+  }
+
+  // ===================== MAP (WITH REGION AUTO-PAN + SEARCH + ADDRESS) =====================
+  let mapInited = false;
+  let map, marker;
+
+  // ✅ مراكز مناطق السعودية (تقريبية ومناسبة كبداية)
+  // نطابق بالاسم الظاهر في القائمة (النص)
+  const REGION_CENTERS = {
+    "حائل":        { lat: 27.5219, lng: 41.6907, zoom: 12 },
+    "الرياض":      { lat: 24.7136, lng: 46.6753, zoom: 11 },
+    "مكة المكرمة": { lat: 21.3891, lng: 39.8579, zoom: 11 },
+    "المدينة المنورة": { lat: 24.5247, lng: 39.5692, zoom: 12 },
+    "المنطقة الشرقية": { lat: 26.4207, lng: 50.0888, zoom: 11 },
+    "القصيم":      { lat: 26.3590, lng: 43.9818, zoom: 11 },
+    "عسير":        { lat: 18.2164, lng: 42.5053, zoom: 11 },
+    "تبوك":        { lat: 28.3838, lng: 36.5550, zoom: 12 },
+    "الجوف":       { lat: 29.8874, lng: 39.3206, zoom: 11 },
+    "الحدود الشمالية": { lat: 30.9753, lng: 41.0381, zoom: 10 },
+    "جازان":       { lat: 16.8892, lng: 42.5706, zoom: 12 },
+    "نجران":       { lat: 17.5656, lng: 44.2289, zoom: 12 },
+    "الباحة":      { lat: 20.0129, lng: 41.4677, zoom: 12 }
+  };
+
+  function normalizeName(s){
+    return (s || "").trim().replace(/\s+/g, " ");
+  }
+
+  function getSelectedRegionCenter(){
+    const sel = document.getElementById("orgRegion");
+    if(!sel) return null;
+
+    const name = normalizeName(sel.options[sel.selectedIndex]?.textContent || "");
+    // جرّب تطابق كامل
+    if(REGION_CENTERS[name]) return REGION_CENTERS[name];
+
+    // جرّب تطابق جزئي (لو اسم المنطقة في DB فيه كلمات زيادة)
+    for(const key of Object.keys(REGION_CENTERS)){
+      if(name.includes(key)) return REGION_CENTERS[key];
+    }
+    return null;
+  }
+
+  function setMarkerAndFields(lat, lng, zoom){
+    if(!map || !marker) return;
+    map.setView([lat, lng], zoom || map.getZoom());
+    marker.setLatLng([lat, lng]);
+    updateLatLngAndAddress({lat, lng});
+  }
+
+  function updateLatLngFields(lat, lng){
+    const latEl = document.getElementById("lat");
+    const lngEl = document.getElementById("lng");
+    if(latEl) latEl.value = Number(lat).toFixed(7);
+    if(lngEl) lngEl.value = Number(lng).toFixed(7);
+  }
+
+  // ✅ Reverse geocoding (عنوان واضح) عبر Nominatim (HTTPS)
+  // ملاحظة: يعتمد على اتصال الانترنت أثناء التطوير
+  let reverseTimer = null;
+  async function reverseGeocode(lat, lng){
+    // تجنّب الطلبات المتكررة بسرعة
+    if(reverseTimer) clearTimeout(reverseTimer);
+
+    reverseTimer = setTimeout(async () => {
+      try{
+        const url =
+          "https://nominatim.openstreetmap.org/reverse?format=jsonv2&accept-language=ar&lat="
+          + encodeURIComponent(lat) + "&lon=" + encodeURIComponent(lng);
+
+        const res = await fetch(url, {
+          method: "GET",
+          headers: {
+            "Accept": "application/json"
+          }
+        });
+
+        if(!res.ok) throw new Error("Reverse geocode failed: " + res.status);
+        const data = await res.json();
+
+        const addr = data?.display_name || "";
+        const box = document.getElementById("addrBox");
+        const text = document.getElementById("addrText");
+
+        if(box && text){
+          if(addr){
+            text.textContent = "العنوان التقريبي: " + addr;
+            box.style.display = "block";
+          }else{
+            box.style.display = "none";
+          }
+        }
+      }catch(e){
+        // لو فشل (بدون انترنت مثلاً) نخفي العنوان ولا نكسر الصفحة
+        const box = document.getElementById("addrBox");
+        if(box) box.style.display = "none";
+      }
+    }, 400);
+  }
+
+  function updateLatLngAndAddress(latlng){
+    updateLatLngFields(latlng.lat, latlng.lng);
+    reverseGeocode(latlng.lat, latlng.lng);
+  }
+
+  function initMapOnce(){
+    if(mapInited) return;
+    const mapDiv = document.getElementById("map");
+    if(!mapDiv) return;
+
+    mapInited = true;
+
+    // ✅ مركز افتراضي (الرياض)
+    let center = [24.7136, 46.6753];
+    let zoom = 11;
+
+    // لو المنطقة مختارة مسبقًا نذهب لها مباشرة (مثل حائل)
+    const c = getSelectedRegionCenter();
+    if(c){
+      center = [c.lat, c.lng];
+      zoom = c.zoom;
+    }
+
+    map = L.map("map", { scrollWheelZoom: true }).setView(center, zoom);
+
+    // ✅ طبقة أوضح من الافتراضية (Carto Voyager) + fallback OSM
+    const carto = L.tileLayer("https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png", {
+      maxZoom: 20,
+      attribution: "&copy; OpenStreetMap &copy; CARTO"
+    });
+    const osm = L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+      maxZoom: 19,
+      attribution: "&copy; OpenStreetMap"
+    });
+
+    carto.addTo(map);
+
+    // ✅ طبقات اختيارية
+    L.control.layers(
+      {
+        "خريطة واضحة (Voyager)": carto,
+        "OpenStreetMap": osm
+      },
+      {},
+      { position: "topleft" }
+    ).addTo(map);
+
+    // ✅ Marker draggable
+    marker = L.marker(center, { draggable:true }).addTo(map);
+
+    updateLatLngAndAddress({lat: center[0], lng: center[1]});
+
+    map.on("click", function(e){
+      marker.setLatLng(e.latlng);
+      updateLatLngAndAddress(e.latlng);
+    });
+
+    marker.on("dragend", function(){
+      updateLatLngAndAddress(marker.getLatLng());
+    });
+
+    // ✅ بحث داخل الخريطة (اكتب: حائل / اسم شارع / معلم)
+    try{
+      const geocoder = L.Control.Geocoder.nominatim({
+        geocodingQueryParams: {
+          countrycodes: "sa",
+          "accept-language": "ar"
+        }
+      });
+
+      const gcControl = L.Control.geocoder({
+        geocoder,
+        defaultMarkGeocode: false,
+        placeholder: "ابحث عن مدينة / حي / معلم..."
+      }).addTo(map);
+
+      gcControl.on("markgeocode", function(e){
+        const ll = e.geocode.center;
+        map.setView(ll, 14);
+        marker.setLatLng(ll);
+        updateLatLngAndAddress(ll);
+      });
+    }catch(e){}
+
+    // ✅ زر "موقعي الحالي"
+    const locateBtn = L.control({position:"topleft"});
+    locateBtn.onAdd = function(){
+      const div = L.DomUtil.create("div");
+      div.style.background = "#fff";
+      div.style.border = "1px solid #e5e7eb";
+      div.style.borderRadius = "12px";
+      div.style.boxShadow = "0 10px 20px rgba(0,0,0,.08)";
+      div.style.padding = "8px 10px";
+      div.style.fontWeight = "900";
+      div.style.cursor = "pointer";
+      div.textContent = "موقعي";
+      div.title = "اذهب لموقعي الحالي";
+      div.onclick = function(){
+        if(!navigator.geolocation) return;
+        navigator.geolocation.getCurrentPosition(function(pos){
+          const me = [pos.coords.latitude, pos.coords.longitude];
+          map.setView(me, 14);
+          marker.setLatLng(me);
+          updateLatLngAndAddress({lat: me[0], lng: me[1]});
+        });
+      };
+      return div;
+    };
+    locateBtn.addTo(map);
+
+    // ✅ عند تغيير المنطقة: نحرك الخريطة تلقائيًا (مثل حائل)
+    const orgRegion = document.getElementById("orgRegion");
+    if(orgRegion){
+      orgRegion.addEventListener("change", () => {
+        const c2 = getSelectedRegionCenter();
+        if(c2){
+          setMarkerAndFields(c2.lat, c2.lng, c2.zoom);
+        }
+      });
+    }
+  }
+</script>
+
+</body>
+</html>
