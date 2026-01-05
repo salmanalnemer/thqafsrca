@@ -10,7 +10,7 @@ from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.core.exceptions import ValidationError
-from django.core.mail import EmailMultiAlternatives, send_mail
+from django.core.mail import EmailMultiAlternatives
 from django.core.validators import validate_email
 from django.db import IntegrityError, transaction
 from django.http import JsonResponse
@@ -67,16 +67,6 @@ def _clean_and_validate_email(raw: str) -> str:
     return email.lower()
 
 
-def _no_reply_email() -> str:
-    # no-reply@thqaf.com (المطلوب)
-    return (getattr(settings, "THQAF_NO_REPLY_EMAIL", "") or "").strip() or os_getenv("THQAF_NO_REPLY_EMAIL") or "no-reply@thqaf.com"
-
-
-def _support_email() -> str:
-    # support@thqaf.com (المطلوب)
-    return (getattr(settings, "THQAF_SUPPORT_EMAIL", "") or "").strip() or os_getenv("THQAF_SUPPORT_EMAIL") or "support@thqaf.com"
-
-
 def os_getenv(k: str) -> str:
     # helper بدون import os أعلى الملف (لتقليل التغييرات)
     try:
@@ -84,6 +74,24 @@ def os_getenv(k: str) -> str:
         return (os.getenv(k, "") or "").strip()
     except Exception:
         return ""
+
+
+def _no_reply_email() -> str:
+    # no-reply@thqaf.com (المطلوب)
+    return (
+        (getattr(settings, "THQAF_NO_REPLY_EMAIL", "") or "").strip()
+        or os_getenv("THQAF_NO_REPLY_EMAIL")
+        or "no-reply@thqaf.com"
+    )
+
+
+def _support_email() -> str:
+    # support@thqaf.com (المطلوب)
+    return (
+        (getattr(settings, "THQAF_SUPPORT_EMAIL", "") or "").strip()
+        or os_getenv("THQAF_SUPPORT_EMAIL")
+        or "support@thqaf.com"
+    )
 
 
 def _logo_url_default() -> str:
@@ -147,7 +155,6 @@ def _send_verify_email_otp(email: str, code: str) -> None:
         "support_email": _support_email(),
     }
 
-    # يقرأ قوالب: emails/verify_email.*
     _send_html_email(
         to_email=email,
         subject=subject,
@@ -184,7 +191,13 @@ def _send_login_otp_email(email: str, code: str) -> None:
     )
 
 
-def send_course_notification_email(*, to_email: str, course_title: str, start_at: str | None = None, extra: str | None = None) -> None:
+def send_course_notification_email(
+    *,
+    to_email: str,
+    course_title: str,
+    start_at: str | None = None,
+    extra: str | None = None
+) -> None:
     """
     إشعار الدورات التدريبية — من no-reply@thqaf.com
     (تقدر تستدعيها من courses app)
@@ -235,9 +248,7 @@ def send_contact_us_email(*, from_name: str, from_email: str, message_text: str)
         txt_template="emails/contact_us.txt",
         html_template="emails/contact_us.html",
         ctx=ctx,
-        # من no-reply لضمان قبول SMTP حتى لو support غير مسموح
         from_email=_no_reply_email(),
-        # الرد يروح مباشرة لصاحب الرسالة
         reply_to=from_email_clean,
     )
 
@@ -678,6 +689,10 @@ def login_otp_view(request):
         display_name = _get_display_name(user)
         request.session["display_name"] = display_name
 
+        # ✅ Toast مرة واحدة بعد الدخول (للأفراد والجهات)
+        request.session["show_login_toast"] = True
+
+        # (اختياري) مودال للأفراد فقط كما كان
         if getattr(user, "role", None) == UserRole.INDIVIDUAL:
             request.session["show_welcome_modal"] = True
             request.session["welcome_name"] = display_name
@@ -687,10 +702,12 @@ def login_otp_view(request):
 
         messages.success(request, "تم تسجيل الدخول بنجاح.")
 
-        # توجيه حسب نوع الحساب
-        # (نبدأ بالأفراد الآن)
+        # ✅ توجيه حسب نوع الحساب
         if getattr(user, "role", None) == UserRole.INDIVIDUAL:
             return _safe_next(request, "individuals:dashboard")
+
+        if getattr(user, "role", None) == UserRole.ORG_REP:
+            return _safe_next(request, "organizations:dashboard")
 
         return _safe_next(request, "home")
 
@@ -750,6 +767,7 @@ def logout_view(request):
     request.session.pop("display_name", None)
     request.session.pop("show_welcome_modal", None)
     request.session.pop("welcome_name", None)
+    request.session.pop("show_login_toast", None)
     request.session.pop("pending_login_user_id", None)
     request.session.pop("pending_login_email", None)
 
@@ -758,10 +776,12 @@ def logout_view(request):
 
 
 # -----------------------------
-# Clear welcome modal (AJAX)
+# Clear welcome modal + toast (AJAX)
 # -----------------------------
 @require_POST
 def clear_welcome_view(request):
+    # كان يمسح المودال فقط، الآن يمسح المودال + التوست
     request.session.pop("show_welcome_modal", None)
     request.session.pop("welcome_name", None)
+    request.session.pop("show_login_toast", None)
     return JsonResponse({"ok": True})

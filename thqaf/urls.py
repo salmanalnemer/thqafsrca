@@ -20,6 +20,7 @@ urlpatterns = [
     path("certificates/", include("certificates.urls")),
     path("support/", include("support.urls")),
     path("contact/", include("contact.urls")),
+    path("organizations/", include("organizations.urls")),
 ]
 
 # ✅ تفعيل خدمة ملفات static/media أثناء التطوير فقط (DEBUG=True)
