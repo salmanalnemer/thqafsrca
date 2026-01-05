@@ -53,7 +53,9 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-    # Platform apps
+
+    # Platform apps (✅ trainers أولاً)
+    "trainers",
     "accounts",
     "regions",
     "organizations",
@@ -98,6 +100,7 @@ TEMPLATES = [
         "BACKEND": "django.template.backends.django.DjangoTemplates",
         "DIRS": [
             BASE_DIR / "templates",
+            BASE_DIR / "templates/trainers_temp",  # ✅ تمت إضافته
             BASE_DIR / "templates/accounts_temp",
             BASE_DIR / "templates/regions_temp",
             BASE_DIR / "templates/organizations_temp",

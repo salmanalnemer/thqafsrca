@@ -166,9 +166,9 @@
 
 <header class="topbar">
   <div class="inner">
-    <a href="{% url 'home' %}" class="brand" aria-label="العودة للرئيسية">
+    <a class="brand" aria-label="العودة للرئيسية">
       <img src="{% static 'assets/img/logothqaf.png' %}" alt="ثقّف" class="brand-logo-small">
-      <span class="badge">لوحة المسؤولين</span>
+      <span class="badge">إدارة التديب والتثقيف المجتمعي</span>
     </a>
 
     <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
@@ -176,7 +176,7 @@
 
       {# ✅ الاسم الكامل فقط (بدون إيميل نهائياً) #}
       {% if display_name %}
-        <span class="pill">مرحباً، {{ display_name }}</span>
+        <span class="pill">مرحباً: {{ display_name }}</span>
       {% else %}
         <span class="pill">مرحباً</span>
       {% endif %}

@@ -43,6 +43,7 @@ STAFF_ROLES = {
 ALLOWED_PORTAL_ROLES = {
     UserRole.INDIVIDUAL,
     UserRole.ORG_REP,
+    UserRole.TRAINER,
     *STAFF_ROLES,
 }
 
@@ -166,6 +167,9 @@ def _redirect_by_role(request, user: User):
 
     if role == UserRole.ORG_REP:
         return _safe_next(request, "organizations:dashboard")
+
+    if role == UserRole.TRAINER:
+        return _safe_next(request, "trainers:dashboard")
 
     # أي دور غير معروف/غير مسموح
     try:

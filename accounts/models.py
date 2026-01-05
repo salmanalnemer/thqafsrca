@@ -46,6 +46,7 @@ class UserRole(models.TextChoices):
     REGION_MANAGER = "region_manager", "مدير إدارة منطقة"
     SUPERVISOR = "supervisor", "مشرف (نائب)"
     COORDINATOR = "coordinator", "منسق الدورات"
+    TRAINER = "trainer", "مدرب"
     ORG_REP = "org_rep", "ممثل جهة"
     INDIVIDUAL = "individual", "فرد"
 
