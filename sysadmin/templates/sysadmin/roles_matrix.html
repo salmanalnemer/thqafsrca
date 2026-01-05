@@ -1,0 +1,42 @@
+{% extends 'sysadmin/base.html' %}
+{% load sysadmin_tags %}
+
+{% block title %}الأدوار والصلاحيات{% endblock %}
+{% block content %}
+<div class="card">
+  <div style="font-weight:900;margin-bottom:8px;">مصفوفة الصلاحيات</div>
+  <div class="muted">كل صفحة/ميزة لها Permission. يمكنك تفعيلها/إيقافها لكل دور.</div>
+</div>
+
+<div class="card">
+  <div style="max-height:620px;overflow:auto;border:1px solid var(--line);border-radius:12px;">
+    <table>
+      <thead>
+        <tr>
+          <th style="width:38%;">الصلاحية</th>
+          {% for r in roles %}
+            <th>{{ r.label }}</th>
+          {% endfor %}
+        </tr>
+      </thead>
+      <tbody>
+        {% for p in perms %}
+        <tr>
+          <td>
+            <div style="font-weight:800;">{{ p.label }}</div>
+            <div class="muted">{{ p.code }}</div>
+          </td>
+          {% for r in roles %}
+            <td style="text-align:center;">
+              <span class="pill {% if p.code in r.allowed %}pill--ok{% else %}pill--no{% endif %}">
+                {% if p.code in r.allowed %}نعم{% else %}لا{% endif %}
+              </span>
+            </td>
+          {% endfor %}
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

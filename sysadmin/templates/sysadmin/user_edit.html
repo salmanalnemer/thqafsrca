@@ -1,0 +1,57 @@
+{% extends 'sysadmin/base.html' %}
+{% load sysadmin_tags %}
+
+{% block title %}إدارة المستخدم{% endblock %}
+{% block content %}
+<div class="grid">
+  <div class="card span6">
+    <div style="font-weight:900;margin-bottom:10px;">بيانات المستخدم</div>
+    <form method="post">
+      {% csrf_token %}
+      {{ form.as_p }}
+      <button class="btn btn-red" type="submit">حفظ</button>
+    </form>
+  </div>
+
+  <div class="card span6">
+    <div style="font-weight:900;margin-bottom:10px;">صلاحيات خاصة للمستخدم (Override)</div>
+    <div class="muted" style="margin-bottom:10px;">هذه الصلاحيات تُقدَّم على صلاحيات الدور.</div>
+
+    <div style="max-height:520px;overflow:auto;border:1px solid var(--line);border-radius:12px;">
+      <table>
+        <thead>
+          <tr>
+            <th style="width:55%;">الصلاحية</th>
+            <th>ممنوحة؟</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for p in perms %}
+          <tr>
+            <td>
+              <div style="font-weight:800;">{{ p.label }}</div>
+              <div class="muted">{{ p.code }}</div>
+            </td>
+            <td>
+              <label class="toggle">
+                <input type="checkbox" name="perm__{{ p.code }}" {% if p.has %}checked{% endif %}>
+                <span></span>
+              </label>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <div style="margin-top:12px;display:flex;gap:10px;flex-wrap:wrap;">
+      <button class="btn btn-red" type="submit" form="user-perms-form">حفظ الصلاحيات</button>
+      <a class="btn btn-soft" href="{% url 'sysadmin:users' %}">رجوع</a>
+    </div>
+  </div>
+</div>
+
+<form id="user-perms-form" method="post" style="display:none;">
+  {% csrf_token %}
+</form>
+{% endblock %}

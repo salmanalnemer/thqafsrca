@@ -1,0 +1,21 @@
+{% extends 'sysadmin/base.html' %}
+{% block title %}قرار طلب صلاحية{% endblock %}
+{% block content %}
+<div class="card">
+  <div style="font-weight:900;margin-bottom:8px;">طلب رقم #{{ pr.id }}</div>
+  <div class="muted">المُقدّم: {{ pr.requested_by.email }} | المستهدف: {{ pr.target_user.email }}</div>
+  <div style="margin-top:8px;">
+    <span class="badge b-warn">{{ pr.permission.code }}</span>
+    {% if pr.allow %}<span class="badge b-green">Allow</span>{% else %}<span class="badge b-red">Deny</span>{% endif %}
+  </div>
+  <div class="muted" style="margin-top:10px;white-space:pre-wrap;">{{ pr.reason|default:"-" }}</div>
+</div>
+
+<div class="card">
+  <form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button class="btn btn-red" type="submit">تنفيذ القرار</button>
+  </form>
+</div>
+{% endblock %}

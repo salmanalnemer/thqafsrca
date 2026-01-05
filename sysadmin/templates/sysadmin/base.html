@@ -1,0 +1,98 @@
+{% load static %}
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>{% block title %}لوحة مدير النظام - ثقف{% endblock %}</title>
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --sr-red:#B71C1C; --sr-red-dark:#8e1414;
+      --ink:#0f172a; --muted:#475569;
+      --line:#e5e7eb; --soft:#f6f7f9;
+      --card:#ffffff; --shadow:0 10px 24px rgba(0,0,0,.10);
+      --radius:16px; --success:#16a34a; --warn:#f59e0b;
+    }
+    *{ box-sizing:border-box; }
+    body{ margin:0; font-family:"Tajawal",system-ui,-apple-system,Segoe UI,Roboto,Arial; background:var(--soft); color:var(--ink); }
+    a{ color:inherit; text-decoration:none; }
+    .layout{ display:flex; min-height:100vh; }
+    .sidebar{ width:280px; background:linear-gradient(180deg,var(--sr-red),var(--sr-red-dark)); color:#fff; padding:18px; position:sticky; top:0; height:100vh; }
+    .brand{ display:flex; align-items:center; gap:10px; margin-bottom:16px; }
+    .brand .dot{ width:12px; height:12px; border-radius:50%; background:#fff; opacity:.9; }
+    .nav a{ display:flex; align-items:center; gap:10px; padding:10px 12px; border-radius:12px; margin:6px 0; background:rgba(255,255,255,.08); }
+    .nav a:hover{ background:rgba(255,255,255,.14); }
+    .main{ flex:1; padding:22px; }
+    .topbar{ display:flex; justify-content:space-between; align-items:center; background:var(--card); border:1px solid var(--line); border-radius:var(--radius); box-shadow:var(--shadow); padding:14px 16px; margin-bottom:16px; }
+    .pill{ display:inline-flex; align-items:center; gap:8px; padding:6px 10px; border-radius:999px; background:rgba(183,28,28,.08); color:var(--sr-red); font-weight:800; }
+    .grid{ display:grid; grid-template-columns:repeat(12,1fr); gap:14px; }
+    .card{ grid-column:span 12; background:var(--card); border:1px solid var(--line); border-radius:var(--radius); box-shadow:var(--shadow); padding:16px; }
+    @media(min-width:900px){ .span6{ grid-column:span 6; } .span4{ grid-column:span 4; } .span8{ grid-column:span 8; } }
+    .btn{ border:0; cursor:pointer; border-radius:12px; padding:10px 12px; font-weight:800; }
+    .btn-red{ background:var(--sr-red); color:#fff; }
+    .btn-ghost{ background:transparent; color:#fff; border:1px solid rgba(255,255,255,.25); }
+    .btn-soft{ background:rgba(183,28,28,.08); color:var(--sr-red); border:1px solid rgba(183,28,28,.18); }
+    .input, select, textarea{ width:100%; padding:10px 12px; border-radius:12px; border:1px solid var(--line); background:#fff; font-family:inherit; }
+    table{ width:100%; border-collapse:collapse; }
+    th, td{ padding:10px; border-bottom:1px solid var(--line); text-align:right; vertical-align:top; }
+    th{ color:var(--muted); font-size:13px; }
+    .muted{ color:var(--muted); }
+    .badge{ display:inline-flex; align-items:center; padding:4px 8px; border-radius:999px; font-weight:800; font-size:12px; }
+    .b-green{ background:rgba(22,163,74,.12); color:var(--success); }
+    .b-warn{ background:rgba(245,158,11,.12); color:var(--warn); }
+    .b-red{ background:rgba(183,28,28,.10); color:var(--sr-red); }
+    .messages{ margin:0 0 12px 0; padding:0; list-style:none; }
+    .messages li{ padding:10px 12px; border-radius:12px; border:1px solid var(--line); background:#fff; margin:8px 0; }
+  </style>
+</head>
+<body>
+  <div class="layout">
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="dot"></div>
+        <div>
+          <div style="font-weight:900;">ثقف</div>
+          <div style="opacity:.85;font-size:12px;">لوحة مدير النظام</div>
+        </div>
+      </div>
+
+      <nav class="nav">
+        <a href="{% url 'sysadmin:dashboard' %}">🏠 <span>الرئيسية</span></a>
+        <a href="{% url 'sysadmin:users' %}">👤 <span>المستخدمون</span></a>
+        <a href="{% url 'sysadmin:roles' %}">🧩 <span>الأدوار والصلاحيات</span></a>
+        <a href="{% url 'sysadmin:requests' %}">📨 <span>طلبات الصلاحيات</span></a>
+        <a href="{% url 'sysadmin:audit' %}">🧾 <span>سجل التدقيق</span></a>
+      </nav>
+
+      <div style="margin-top:16px; border-top:1px solid rgba(255,255,255,.18); padding-top:12px;">
+        <div style="font-size:12px; opacity:.9;">مسجّل كـ</div>
+        <div style="font-weight:900;">{{ request.user.full_name|default:request.user.email }}</div>
+        <div style="font-size:12px; opacity:.85;">{{ request.user.role }}</div>
+
+        <form method="post" action="{% url 'accounts:logout' %}" style="margin-top:10px;">
+          {% csrf_token %}
+          <button class="btn btn-ghost" type="submit" style="width:100%;">تسجيل الخروج</button>
+        </form>
+      </div>
+    </aside>
+
+    <main class="main">
+      <div class="topbar">
+        <div class="pill">تحكم مركزي بالصلاحيات</div>
+        <a class="btn btn-soft" href="{% url 'home' %}">العودة للموقع</a>
+      </div>
+
+      {% if messages %}
+        <ul class="messages">
+          {% for message in messages %}
+            <li>{{ message }}</li>
+          {% endfor %}
+        </ul>
+      {% endif %}
+
+      {% block content %}{% endblock %}
+    </main>
+  </div>
+</body>
+</html>

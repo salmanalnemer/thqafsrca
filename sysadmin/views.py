@@ -1,190 +1,154 @@
 from __future__ import annotations
 
-import logging
-from typing import Any
-
-from django import forms
 from django.contrib import messages
-from django.contrib.auth.decorators import login_required
 from django.db import transaction
-from django.http import HttpRequest, HttpResponse
+from django.db.models import Count, Q
 from django.shortcuts import get_object_or_404, redirect, render
+from django.utils import timezone
+from django.views.decorators.http import require_http_methods, require_POST
 
 from accounts.models import User, UserRole
-from organizations.models import OrganizationBranch
-from regions.models import Region
+from iam.decorators import permission_required
+from iam.models import AuditEvent, Permission, RolePermission, UserPermission, PermissionRequest
+from iam.services import audit, invalidate_perm_cache
 
-from .decorators import sysadmin_required
-from .models import AuditLog
+from .forms import UserUpdateForm, PermissionRequestDecisionForm
 
-logger = logging.getLogger(__name__)
-
-
-def _client_ip(request: HttpRequest) -> str | None:
-    # خلف Proxy استخدم X-Forwarded-For إن كان مضبوط عندكم
-    xff = (request.META.get("HTTP_X_FORWARDED_FOR") or "").split(",")[0].strip()
-    if xff:
-        return xff
-    return (request.META.get("REMOTE_ADDR") or None)
-
-
-def _ua(request: HttpRequest) -> str:
-    return (request.META.get("HTTP_USER_AGENT") or "")[:256]
-
-
-def _snapshot_user(u: User) -> dict[str, Any]:
-    return {
-        "id": u.id,
-        "email": u.email,
-        "first_name": u.first_name,
-        "last_name": u.last_name,
-        "phone": getattr(u, "phone", ""),
-        "role": u.role,
-        "is_active": u.is_active,
-        "region_id": u.region_id,
-        "org_branch_id": u.org_branch_id,
+@permission_required("sysadmin.dashboard")
+def dashboard(request):
+    # quick stats
+    stats = {
+        "users": User.objects.count(),
+        "active_users": User.objects.filter(is_active=True).count(),
+        "pending_requests": PermissionRequest.objects.filter(status=PermissionRequest.Status.PENDING).count(),
+        "audit_today": AuditEvent.objects.filter(created_at__date=timezone.now().date()).count(),
     }
+    roles = User.objects.values("role").annotate(n=Count("id")).order_by("-n")
+    return render(request, "sysadmin/dashboard.html", {"stats": stats, "roles": roles})
 
+@permission_required("sysadmin.users")
+def users_list(request):
+    q = (request.GET.get("q") or "").strip()
+    role = (request.GET.get("role") or "").strip()
+    qs = User.objects.all().order_by("-date_joined")
+    if q:
+        qs = qs.filter(Q(email__icontains=q) | Q(full_name__icontains=q) | Q(phone__icontains=q))
+    if role:
+        qs = qs.filter(role=role)
+    users = qs[:200]
+    return render(request, "sysadmin/users_list.html", {"users": users, "q": q, "role": role, "roles": UserRole.choices})
 
-def _audit(request: HttpRequest, action: str, target: User | None, before: dict | None, after: dict | None, note: str = "") -> None:
-    try:
-        AuditLog.objects.create(
-            actor=request.user if request.user.is_authenticated else None,
-            action=action,
-            target_user=target,
-            ip_address=_client_ip(request),
-            user_agent=_ua(request),
-            before=before,
-            after=after,
-            note=(note or "")[:250],
-        )
-    except Exception:
-        logger.exception("Failed to write AuditLog")
-
-
-class UserFilterForm(forms.Form):
-    q = forms.CharField(required=False, label="بحث")
-    role = forms.ChoiceField(
-        required=False,
-        label="الدور",
-        choices=[("", "الكل")] + list(UserRole.choices),
-    )
-    region = forms.ModelChoiceField(
-        required=False,
-        label="المنطقة",
-        queryset=Region.objects.all().order_by("name"),
-        empty_label="الكل",
-    )
-
-
-class UserEditForm(forms.ModelForm):
-    class Meta:
-        model = User
-        fields = ["first_name", "last_name", "phone", "role", "is_active", "region", "org_branch"]
-        widgets = {
-            "first_name": forms.TextInput(attrs={"autocomplete": "off"}),
-            "last_name": forms.TextInput(attrs={"autocomplete": "off"}),
-            "phone": forms.TextInput(attrs={"autocomplete": "off", "dir": "ltr"}),
-        }
-
-    def clean(self):
-        cleaned = super().clean()
-        role = cleaned.get("role")
-        region = cleaned.get("region")
-        org_branch = cleaned.get("org_branch")
-
-        # قواعد نطاق بسيطة (مبدئية)
-        if role in {UserRole.REGION_MANAGER, UserRole.SUPERVISOR, UserRole.COORDINATOR, UserRole.TRAINER} and not region:
-            raise forms.ValidationError("هذا الدور يتطلب تحديد المنطقة.")
-        if role == UserRole.ORG_REP and not org_branch:
-            raise forms.ValidationError("ممثل الجهة يتطلب تحديد فرع الجهة.")
-        return cleaned
-
-
-@login_required
-@sysadmin_required
-def dashboard(request: HttpRequest) -> HttpResponse:
-    ctx = {
-        "active": "dashboard",
-        "stats": {
-            "users_total": User.objects.count(),
-            "users_active": User.objects.filter(is_active=True).count(),
-            "org_reps": User.objects.filter(role=UserRole.ORG_REP).count(),
-            "trainers": User.objects.filter(role=UserRole.TRAINER).count(),
-        },
-        "recent_audit": AuditLog.objects.select_related("actor", "target_user")[:8],
-    }
-    return render(request, "sysadmin_temp/dashboard.html", ctx)
-
-
-@login_required
-@sysadmin_required
-def users_list(request: HttpRequest) -> HttpResponse:
-    form = UserFilterForm(request.GET or None)
-    qs = User.objects.select_related("region", "org_branch").order_by("-date_joined")
-
-    if form.is_valid():
-        q = (form.cleaned_data.get("q") or "").strip()
-        role = form.cleaned_data.get("role") or ""
-        region = form.cleaned_data.get("region")
-
-        if q:
-            qs = qs.filter(email__icontains=q) | qs.filter(first_name__icontains=q) | qs.filter(last_name__icontains=q)
-        if role:
-            qs = qs.filter(role=role)
-        if region:
-            qs = qs.filter(region=region)
-
-    ctx = {
-        "active": "users",
-        "form": form,
-        "users": qs[:200],  # سقف حماية للأداء
-    }
-    return render(request, "sysadmin_temp/users_list.html", ctx)
-
-
-@login_required
-@sysadmin_required
-def user_edit(request: HttpRequest, user_id: int) -> HttpResponse:
-    u = get_object_or_404(User.objects.select_related("region", "org_branch"), pk=user_id)
-    before = _snapshot_user(u)
-
+@permission_required("sysadmin.user_edit")
+@require_http_methods(["GET", "POST"])
+def user_edit(request, user_id: int):
+    u = get_object_or_404(User, id=user_id)
     if request.method == "POST":
-        form = UserEditForm(request.POST, instance=u)
+        form = UserUpdateForm(request.POST, instance=u)
         if form.is_valid():
-            with transaction.atomic():
-                form.save()
-            after = _snapshot_user(u)
-
-            # تحديد نوع التدقيق
-            action = "user_update"
-            if before.get("role") != after.get("role"):
-                action = "role_change"
-            elif before.get("region_id") != after.get("region_id") or before.get("org_branch_id") != after.get("org_branch_id"):
-                action = "scope_change"
-            elif before.get("is_active") != after.get("is_active"):
-                action = "user_enable" if after.get("is_active") else "user_disable"
-
-            _audit(request, action=action, target=u, before=before, after=after, note="تعديل عبر لوحة مدير النظام")
-            messages.success(request, "تم حفظ التغييرات بنجاح.")
-            return redirect("sysadmin:users_list")
-        else:
-            messages.error(request, "تأكد من الحقول وحاول مرة أخرى.")
+            before = {"role": u.role, "is_active": u.is_active, "region_id": u.region_id, "org_branch_id": u.org_branch_id, "individual_id": u.individual_id}
+            form.save()
+            after = {"role": u.role, "is_active": u.is_active, "region_id": u.region_id, "org_branch_id": u.org_branch_id, "individual_id": u.individual_id}
+            invalidate_perm_cache()
+            audit(request, action="user.update", target_user=u, meta={"before": before, "after": after})
+            messages.success(request, "تم تحديث المستخدم.")
+            return redirect("sysadmin:users")
+        messages.error(request, "تحقق من الحقول.")
     else:
-        form = UserEditForm(instance=u)
+        form = UserUpdateForm(instance=u)
+    # user overrides
+    perms = Permission.objects.filter(is_active=True).order_by("module", "code")
+    user_links = {up.permission_id: up for up in UserPermission.objects.filter(user=u)}
+    return render(request, "sysadmin/user_edit.html", {"u": u, "form": form, "perms": perms, "user_links": user_links})
 
-    ctx = {
-        "active": "users",
-        "u": u,
-        "form": form,
-        "regions": Region.objects.all().order_by("name"),
-        "branches": OrganizationBranch.objects.select_related("organization").all().order_by("organization__name", "name"),
-    }
-    return render(request, "sysadmin_temp/user_edit.html", ctx)
+@permission_required("sysadmin.user_perm_toggle")
+@require_POST
+def user_perm_toggle(request, user_id: int, perm_id: int):
+    u = get_object_or_404(User, id=user_id)
+    p = get_object_or_404(Permission, id=perm_id)
+    allow = (request.POST.get("allow") == "1")
+    before = UserPermission.objects.filter(user=u, permission=p).first()
+    with transaction.atomic():
+        UserPermission.objects.update_or_create(user=u, permission=p, defaults={"allow": allow})
+    invalidate_perm_cache()
+    audit(request, action="userperm.set", target_user=u, meta={"permission": p.code, "allow": allow, "before": (before.allow if before else None)})
+    messages.success(request, "تم تحديث صلاحية المستخدم.")
+    return redirect("sysadmin:user_edit", user_id=u.id)
 
+@permission_required("sysadmin.roles")
+def roles_matrix(request):
+    perms = Permission.objects.filter(is_active=True).order_by("module", "code")
+    roles = [r[0] for r in UserRole.choices]
+    links = RolePermission.objects.select_related("permission").all()
+    matrix = {(l.role, l.permission_id): l.allow for l in links}
+    return render(request, "sysadmin/roles_matrix.html", {"perms": perms, "roles": roles, "role_choices": UserRole.choices, "matrix": matrix})
 
-@login_required
-@sysadmin_required
-def audit_list(request: HttpRequest) -> HttpResponse:
-    logs = AuditLog.objects.select_related("actor", "target_user")[:250]
-    return render(request, "sysadmin_temp/audit_list.html", {"active": "audit", "logs": logs})
+@permission_required("sysadmin.role_perm_toggle")
+@require_POST
+def role_perm_toggle(request):
+    role = request.POST.get("role") or ""
+    perm_id = int(request.POST.get("perm_id") or "0")
+    allow = (request.POST.get("allow") == "1")
+    if role not in dict(UserRole.choices):
+        messages.error(request, "Role غير صحيح.")
+        return redirect("sysadmin:roles")
+    p = get_object_or_404(Permission, id=perm_id)
+    before = RolePermission.objects.filter(role=role, permission=p).first()
+    with transaction.atomic():
+        RolePermission.objects.update_or_create(role=role, permission=p, defaults={"allow": allow})
+    invalidate_perm_cache()
+    audit(request, action="roleperm.set", meta={"role": role, "permission": p.code, "allow": allow, "before": (before.allow if before else None)})
+    messages.success(request, "تم تحديث صلاحية الدور.")
+    return redirect("sysadmin:roles")
+
+@permission_required("sysadmin.requests")
+def requests_list(request):
+    status = (request.GET.get("status") or "pending").strip()
+    qs = PermissionRequest.objects.select_related("requested_by","target_user","permission").all()
+    if status:
+        qs = qs.filter(status=status)
+    items = qs[:200]
+    return render(request, "sysadmin/requests_list.html", {"items": items, "status": status, "Status": PermissionRequest.Status})
+
+@permission_required("sysadmin.request_decide")
+@require_http_methods(["GET", "POST"])
+def request_decide(request, req_id: int):
+    pr = get_object_or_404(PermissionRequest.objects.select_related("requested_by","target_user","permission"), id=req_id)
+    if pr.status != PermissionRequest.Status.PENDING:
+        messages.info(request, "تم اتخاذ قرار سابقًا.")
+        return redirect("sysadmin:requests")
+    if request.method == "POST":
+        form = PermissionRequestDecisionForm(request.POST)
+        if form.is_valid():
+            decision = form.cleaned_data["decision"]
+            note = form.cleaned_data["note"]
+            with transaction.atomic():
+                pr.decided_by = request.user
+                pr.decided_at = timezone.now()
+                if decision == "approve":
+                    pr.status = PermissionRequest.Status.APPROVED
+                    UserPermission.objects.update_or_create(
+                        user=pr.target_user, permission=pr.permission, defaults={"allow": pr.allow}
+                    )
+                    invalidate_perm_cache()
+                    audit(request, action="permrequest.approve", target_user=pr.target_user, meta={"permission": pr.permission.code, "allow": pr.allow, "note": note})
+                    messages.success(request, "تم اعتماد الطلب وتطبيقه.")
+                else:
+                    pr.status = PermissionRequest.Status.REJECTED
+                    audit(request, action="permrequest.reject", target_user=pr.target_user, meta={"permission": pr.permission.code, "allow": pr.allow, "note": note})
+                    messages.success(request, "تم رفض الطلب.")
+                pr.reason = (pr.reason + f"\n\n[قرار]: {note}").strip()
+                pr.save()
+            return redirect("sysadmin:requests")
+        messages.error(request, "تحقق من المدخلات.")
+    else:
+        form = PermissionRequestDecisionForm()
+    return render(request, "sysadmin/request_decide.html", {"pr": pr, "form": form})
+
+@permission_required("sysadmin.audit")
+def audit_log(request):
+    q = (request.GET.get("q") or "").strip()
+    qs = AuditEvent.objects.select_related("actor","target_user").all()
+    if q:
+        qs = qs.filter(Q(action__icontains=q) | Q(actor__email__icontains=q) | Q(target_user__email__icontains=q))
+    items = qs[:200]
+    return render(request, "sysadmin/audit.html", {"items": items, "q": q})

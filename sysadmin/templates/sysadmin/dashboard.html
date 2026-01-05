@@ -1,0 +1,36 @@
+{% extends 'sysadmin/base.html' %}
+{% block title %}لوحة مدير النظام{% endblock %}
+{% block content %}
+<div class="grid">
+  <div class="card span4">
+    <div class="muted">إجمالي المستخدمين</div>
+    <div style="font-size:28px;font-weight:900;">{{ stats.users }}</div>
+  </div>
+  <div class="card span4">
+    <div class="muted">النشطون</div>
+    <div style="font-size:28px;font-weight:900;">{{ stats.active_users }}</div>
+  </div>
+  <div class="card span4">
+    <div class="muted">طلبات قيد المراجعة</div>
+    <div style="font-size:28px;font-weight:900;">{{ stats.pending_requests }}</div>
+  </div>
+  <div class="card span4">
+    <div class="muted">أحداث اليوم</div>
+    <div style="font-size:28px;font-weight:900;">{{ stats.audit_today }}</div>
+  </div>
+
+  <div class="card span12">
+    <div style="font-weight:900;margin-bottom:10px;">توزيع المستخدمين حسب الدور</div>
+    <table>
+      <thead><tr><th>الدور</th><th>العدد</th></tr></thead>
+      <tbody>
+      {% for r in roles %}
+        <tr><td>{{ r.role }}</td><td>{{ r.n }}</td></tr>
+      {% empty %}
+        <tr><td colspan="2" class="muted">لا يوجد بيانات.</td></tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

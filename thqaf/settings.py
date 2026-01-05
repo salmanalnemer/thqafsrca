@@ -66,6 +66,7 @@ INSTALLED_APPS = [
     "support",
     "contact",
     "staff",
+    "iam",
     "sysadmin",
 ]
 

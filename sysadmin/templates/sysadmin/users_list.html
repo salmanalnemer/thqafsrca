@@ -1,0 +1,45 @@
+{% extends 'sysadmin/base.html' %}
+{% block title %}المستخدمون{% endblock %}
+{% block content %}
+<div class="card">
+  <form method="get" style="display:grid;grid-template-columns:1fr 220px 140px;gap:10px;align-items:end;">
+    <div>
+      <div class="muted" style="margin-bottom:6px;">بحث</div>
+      <input class="input" name="q" value="{{ q }}" placeholder="اسم / بريد / جوال"/>
+    </div>
+    <div>
+      <div class="muted" style="margin-bottom:6px;">الدور</div>
+      <select class="input" name="role">
+        <option value="">الكل</option>
+        {% for k,v in roles %}
+          <option value="{{ k }}" {% if role == k %}selected{% endif %}>{{ v }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <button class="btn btn-red" type="submit">تصفية</button>
+  </form>
+</div>
+
+<div class="card">
+  <table>
+    <thead>
+      <tr>
+        <th>الاسم</th><th>البريد</th><th>الدور</th><th>نشط</th><th></th>
+      </tr>
+    </thead>
+    <tbody>
+    {% for u in users %}
+      <tr>
+        <td>{{ u.full_name|default:"-" }}</td>
+        <td>{{ u.email }}</td>
+        <td><span class="badge b-warn">{{ u.role }}</span></td>
+        <td>{% if u.is_active %}<span class="badge b-green">نعم</span>{% else %}<span class="badge b-red">لا</span>{% endif %}</td>
+        <td><a class="btn btn-soft" href="{% url 'sysadmin:user_edit' u.id %}">إدارة</a></td>
+      </tr>
+    {% empty %}
+      <tr><td colspan="5" class="muted">لا يوجد مستخدمون.</td></tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

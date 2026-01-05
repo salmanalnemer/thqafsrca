@@ -1,0 +1,32 @@
+{% extends 'sysadmin/base.html' %}
+{% block title %}سجل التدقيق{% endblock %}
+{% block content %}
+<div class="card">
+  <form method="get" style="display:flex;gap:10px;align-items:end;flex-wrap:wrap;">
+    <div style="min-width:320px;">
+      <div class="muted" style="margin-bottom:6px;">بحث</div>
+      <input class="input" name="q" value="{{ q }}" placeholder="action / email"/>
+    </div>
+    <button class="btn btn-red" type="submit">بحث</button>
+  </form>
+</div>
+
+<div class="card">
+  <table>
+    <thead><tr><th>الوقت</th><th>الحدث</th><th>من</th><th>على</th><th>تفاصيل</th></tr></thead>
+    <tbody>
+    {% for e in items %}
+      <tr>
+        <td style="white-space:nowrap;">{{ e.created_at|date:"Y-m-d H:i" }}</td>
+        <td><span class="badge b-warn">{{ e.action }}</span></td>
+        <td>{% if e.actor %}{{ e.actor.email }}{% else %}-{% endif %}</td>
+        <td>{% if e.target_user %}{{ e.target_user.email }}{% else %}-{% endif %}</td>
+        <td class="muted" style="font-size:12px;white-space:pre-wrap;">{{ e.meta }}</td>
+      </tr>
+    {% empty %}
+      <tr><td colspan="5" class="muted">لا يوجد.</td></tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

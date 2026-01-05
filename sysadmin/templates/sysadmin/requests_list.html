@@ -1,0 +1,39 @@
+{% extends 'sysadmin/base.html' %}
+{% block title %}طلبات الصلاحيات{% endblock %}
+{% block content %}
+<div class="card">
+  <form method="get" style="display:flex;gap:10px;align-items:end;flex-wrap:wrap;">
+    <div style="min-width:220px;">
+      <div class="muted" style="margin-bottom:6px;">الحالة</div>
+      <select class="input" name="status">
+        <option value="pending" {% if status == 'pending' %}selected{% endif %}>قيد المراجعة</option>
+        <option value="approved" {% if status == 'approved' %}selected{% endif %}>مقبول</option>
+        <option value="rejected" {% if status == 'rejected' %}selected{% endif %}>مرفوض</option>
+      </select>
+    </div>
+    <button class="btn btn-red" type="submit">تطبيق</button>
+  </form>
+</div>
+
+<div class="card">
+  <table>
+    <thead><tr><th>المُقدّم</th><th>المستهدف</th><th>الصلاحية</th><th>نوع</th><th>الحالة</th><th></th></tr></thead>
+    <tbody>
+    {% for it in items %}
+      <tr>
+        <td>{{ it.requested_by.email }}</td>
+        <td>{{ it.target_user.email }}</td>
+        <td>{{ it.permission.code }}</td>
+        <td>{% if it.allow %}<span class="badge b-green">Allow</span>{% else %}<span class="badge b-red">Deny</span>{% endif %}</td>
+        <td>
+          {% if it.status == 'pending' %}<span class="badge b-warn">قيد المراجعة</span>{% elif it.status == 'approved' %}<span class="badge b-green">مقبول</span>{% else %}<span class="badge b-red">مرفوض</span>{% endif %}
+        </td>
+        <td><a class="btn btn-soft" href="{% url 'sysadmin:request_decide' it.id %}">فتح</a></td>
+      </tr>
+    {% empty %}
+      <tr><td colspan="6" class="muted">لا يوجد.</td></tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}
