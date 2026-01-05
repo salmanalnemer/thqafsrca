@@ -1,0 +1,60 @@
+{% extends "individuals_temp/_layout.html" %}
+
+{% block title %}لوحة الأفراد{% endblock %}
+
+{% block extra_head %}
+<style>
+  .kpi{ display:flex; gap:10px; flex-wrap:wrap; margin-top:10px; }
+  .kpi .box{ padding:12px 14px; border:1px solid var(--line); border-radius:14px; background:#fff; min-width:160px; }
+  .kpi .num{ font-size:22px; font-weight:900; }
+  .kpi .lbl{ color:var(--muted); font-weight:700; }
+</style>
+{% endblock %}
+
+{% block content %}
+  <div class="grid">
+    <section class="card">
+      <h1>لوحة التحكم</h1>
+      <p>
+        هنا سيتم عرض ملخص دوراتك وشهاداتك. (حاليًا القوائم فارغة لأن تطبيقات الدورات/الشهادات غير موجودة داخل هذا الملف المضغوط.)
+      </p>
+
+      <div class="kpi">
+        <div class="box">
+          <div class="num">{{ courses|length }}</div>
+          <div class="lbl">الدورات</div>
+        </div>
+        <div class="box">
+          <div class="num">{{ certificates|length }}</div>
+          <div class="lbl">الشهادات</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="card half">
+      <h2>آخر الدورات</h2>
+      {% if courses %}
+        <ul class="list">
+          {% for c in courses|slice:":5" %}
+            <li><span>{{ c.title }}</span><span class="muted">{{ c.status }}</span></li>
+          {% endfor %}
+        </ul>
+      {% else %}
+        <p class="muted">لا توجد دورات لعرضها حالياً.</p>
+      {% endif %}
+    </section>
+
+    <section class="card half">
+      <h2>آخر الشهادات</h2>
+      {% if certificates %}
+        <ul class="list">
+          {% for c in certificates|slice:":5" %}
+            <li><span>{{ c.title }}</span><span class="muted">{{ c.issued_at }}</span></li>
+          {% endfor %}
+        </ul>
+      {% else %}
+        <p class="muted">لا توجد شهادات لعرضها حالياً.</p>
+      {% endif %}
+    </section>
+  </div>
+{% endblock %}

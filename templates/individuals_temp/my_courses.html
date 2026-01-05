@@ -1,0 +1,22 @@
+{% extends "individuals_temp/_layout.html" %}
+
+{% block title %}دوراتي{% endblock %}
+
+{% block content %}
+  <div class="grid">
+    <section class="card">
+      <h1>دوراتي</h1>
+      <p>هذه الصفحة ستعرض دورات الفرد مع عزل كامل حسب حساب المستخدم والمنطقة.</p>
+
+      {% if courses %}
+        <ul class="list">
+          {% for c in courses %}
+            <li><span>{{ c.title }}</span><span class="muted">{{ c.status }}</span></li>
+          {% endfor %}
+        </ul>
+      {% else %}
+        <p class="muted">لا توجد دورات لعرضها حالياً.</p>
+      {% endif %}
+    </section>
+  </div>
+{% endblock %}

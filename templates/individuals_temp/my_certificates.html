@@ -1,0 +1,22 @@
+{% extends "individuals_temp/_layout.html" %}
+
+{% block title %}شهاداتي{% endblock %}
+
+{% block content %}
+  <div class="grid">
+    <section class="card">
+      <h1>شهاداتي</h1>
+      <p>هذه الصفحة ستعرض شهادات الفرد مع عزل كامل حسب حساب المستخدم والمنطقة.</p>
+
+      {% if certificates %}
+        <ul class="list">
+          {% for c in certificates %}
+            <li><span>{{ c.title }}</span><span class="muted">{{ c.issued_at }}</span></li>
+          {% endfor %}
+        </ul>
+      {% else %}
+        <p class="muted">لا توجد شهادات لعرضها حالياً.</p>
+      {% endif %}
+    </section>
+  </div>
+{% endblock %}

@@ -1,0 +1,300 @@
+{% load static %}
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>{% block title %}لوحة الأفراد - ثقف{% endblock %}</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;600;700;800&display=swap" rel="stylesheet">
+
+  <style>
+    :root{
+      --sr-red:#B71C1C;
+      --sr-red-dark:#8e1414;
+      --ink:#0f172a;
+      --muted:#475569;
+      --line:#e5e7eb;
+      --soft:#f6f7f9;
+      --card:#ffffff;
+      --shadow:0 10px 24px rgba(0,0,0,.10);
+      --radius:16px;
+    }
+
+    *{ box-sizing:border-box; }
+    body{
+      margin:0;
+      font-family:"Tajawal",system-ui,-apple-system,Segoe UI,Roboto,Arial;
+      color:var(--ink);
+      background:#f7f7fb;
+    }
+
+    /* ================= TOPBAR ================= */
+    .topbar{
+      background:#fff;
+      border-bottom:1px solid var(--line);
+      position:sticky;
+      top:0;
+      z-index:20;
+    }
+    .topbar .inner{
+      padding:12px 16px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+    }
+
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      font-weight:800;
+      text-decoration:none;
+      color:inherit;
+    }
+
+    .brand-logo-small{
+      width:100px;
+      height:auto;
+      object-fit:contain;
+      display:block;
+    }
+
+    .badge{
+      background:linear-gradient(90deg,var(--sr-red),var(--sr-red-dark));
+      color:#fff;
+      padding:6px 10px;
+      border-radius:999px;
+      font-size:12px;
+    }
+
+    .pill{
+      background:var(--soft);
+      border:1px solid var(--line);
+      padding:6px 10px;
+      border-radius:999px;
+      color:var(--muted);
+      font-size:12px;
+    }
+
+    /* ================= LAYOUT ================= */
+    .shell{
+      display:grid;
+      grid-template-columns:270px 1fr;
+      min-height:calc(100vh - 58px);
+    }
+    @media (max-width:980px){
+      .shell{ grid-template-columns:1fr; }
+    }
+
+    /* ================= SIDEBAR ================= */
+    .sidebar{
+      background:#fff;
+      border-left:1px solid var(--line);
+      padding:14px;
+    }
+    @media (max-width:980px){
+      .sidebar{
+        border-left:none;
+        border-bottom:1px solid var(--line);
+      }
+    }
+
+    .nav{
+      display:flex;
+      flex-direction:column;
+      gap:8px;
+      margin-top:10px;
+    }
+    .nav a{
+      text-decoration:none;
+      color:var(--ink);
+      border:1px solid var(--line);
+      border-radius:14px;
+      padding:10px 12px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      background:#fff;
+      font-weight:700;
+    }
+    .nav a.active{
+      background:linear-gradient(90deg, rgba(183,28,28,.12), rgba(142,20,20,.06));
+      border-color:rgba(183,28,28,.25);
+    }
+    .nav small{
+      color:var(--muted);
+      font-weight:600;
+    }
+
+    /* ================= CONTENT ================= */
+    .content{ padding:18px; }
+    .wrap{ max-width:1100px; }
+
+    .grid{
+      display:grid;
+      grid-template-columns:repeat(12,1fr);
+      gap:12px;
+    }
+
+    .card{
+      grid-column:span 12;
+      background:var(--card);
+      border:1px solid var(--line);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      padding:16px;
+    }
+
+    .card.half{ grid-column:span 6; }
+    @media (max-width:980px){
+      .card.half{ grid-column:span 12; }
+    }
+
+    h1{ margin:0 0 10px; font-size:20px; }
+    h2{ margin:0 0 10px; font-size:16px; }
+
+    p{
+      margin:0;
+      color:var(--muted);
+      line-height:1.9;
+    }
+
+    .btn{
+      cursor:pointer;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:8px;
+      padding:10px 12px;
+      border-radius:12px;
+      border:1px solid var(--line);
+      background:#fff;
+      font-weight:800;
+    }
+    .btn--red{
+      background:linear-gradient(90deg,var(--sr-red),var(--sr-red-dark));
+      border-color:transparent;
+      color:#fff;
+    }
+
+    .list{
+      margin:10px 0 0;
+      padding:0;
+      list-style:none;
+    }
+    .list li{
+      padding:10px 12px;
+      border:1px solid var(--line);
+      border-radius:14px;
+      background:#fff;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+    }
+    .list li+li{ margin-top:8px; }
+
+    .muted{ color:var(--muted); }
+
+    /* ================= FOOTER ================= */
+    .footer{
+      margin-top:14px;
+      padding:12px 16px;
+      color:#fff;
+      background:linear-gradient(90deg,var(--sr-red),var(--sr-red-dark));
+    }
+  </style>
+
+  {% block extra_head %}{% endblock %}
+</head>
+
+<body>
+
+<header class="topbar">
+  <div class="inner">
+
+    <!-- ✅ الشعار الصغير -->
+    <a href="{% url 'home' %}" class="brand" aria-label="العودة للرئيسية">
+      <img src="{% static 'assets/img/logothqaf.png' %}"
+           alt="ثقّف"
+           class="brand-logo-small">
+      <span class="badge">لوحة الأفراد</span>
+    </a>
+
+    <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+      {% if region %}
+        <span class="pill">المنطقة: {{ region }}</span>
+      {% endif %}
+      <span class="pill">مرحباً، {{ display_name }}</span>
+
+      <form method="post" action="{% url 'accounts:logout' %}" style="margin:0;">
+        {% csrf_token %}
+        <button class="btn btn--red" type="submit">تسجيل خروج</button>
+      </form>
+    </div>
+
+  </div>
+</header>
+
+<div class="shell">
+
+  <aside class="sidebar">
+    <div class="muted" style="font-weight:800;">القائمة</div>
+
+    <nav class="nav">
+      <a href="{% url 'individuals:dashboard' %}" class="{% if active == 'dashboard' %}active{% endif %}">
+        <span>لوحة التحكم</span>
+        <small>نظرة عامة</small>
+      </a>
+
+      <a href="{% url 'individuals:my_courses' %}" class="{% if active == 'courses' %}active{% endif %}">
+        <span>دوراتي</span>
+        <small>قائمة الدورات</small>
+      </a>
+
+      <a href="{% url 'individuals:my_certificates' %}" class="{% if active == 'certs' %}active{% endif %}">
+        <span>شهاداتي</span>
+        <small>ملفات الشهادات</small>
+      </a>
+    </nav>
+
+    <div class="muted" style="margin-top:14px; font-size:12px; line-height:1.8;">
+      * ملاحظة: سيتم ربط الدورات والشهادات فعليًا عند توفر تطبيقات
+      <b>courses</b> و <b>certificates</b>.
+    </div>
+  </aside>
+
+  <main class="content">
+    <div class="wrap">
+
+      {% if messages %}
+        <div class="card" style="border-color:rgba(183,28,28,.2); background:rgba(183,28,28,.04);">
+          <ul class="list" style="margin:0;">
+            {% for message in messages %}
+              <li>
+                <span>{{ message }}</span>
+                <span class="muted">{{ message.tags }}</span>
+              </li>
+            {% endfor %}
+          </ul>
+        </div>
+      {% endif %}
+
+      {% block content %}{% endblock %}
+
+    </div>
+  </main>
+
+</div>
+
+<footer class="footer">
+  <div style="max-width:1100px; margin:0 auto; display:flex; justify-content:space-between; gap:10px; flex-wrap:wrap;">
+    <div>© {% now "Y" %} منصة ثقف</div>
+    <div>الدعم: support@thqaf.com</div>
+  </div>
+</footer>
+
+</body>
+</html>

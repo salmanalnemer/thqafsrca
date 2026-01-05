@@ -1,14 +1,14 @@
 # thqaf/urls.py
 from django.contrib import admin
 from django.urls import path, include
-from django.views.generic import TemplateView
+from .views import home_view
 
 from django.conf import settings
 from django.conf.urls.static import static
 
 urlpatterns = [
     # صفحة الهبوط (الرئيسية) - الأفضل تكون home.html وليس base.html
-    path("", TemplateView.as_view(template_name="home.html"), name="home"),
+    path("", home_view, name="home"),
     path("admin/", admin.site.urls),
 
     path("accounts/", include("accounts.urls")),

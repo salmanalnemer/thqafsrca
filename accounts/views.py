@@ -686,6 +686,12 @@ def login_otp_view(request):
         request.session.pop("pending_login_email", None)
 
         messages.success(request, "تم تسجيل الدخول بنجاح.")
+
+        # توجيه حسب نوع الحساب
+        # (نبدأ بالأفراد الآن)
+        if getattr(user, "role", None) == UserRole.INDIVIDUAL:
+            return _safe_next(request, "individuals:dashboard")
+
         return _safe_next(request, "home")
 
     except Exception as e:
