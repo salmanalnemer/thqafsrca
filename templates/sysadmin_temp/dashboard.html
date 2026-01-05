@@ -1,0 +1,60 @@
+{% extends "sysadmin_temp/_layout.html" %}
+{% block title %}لوحة مدير النظام - الرئيسية{% endblock %}
+{% block header_title %}الرئيسية{% endblock %}
+
+{% block content %}
+  <div class="grid">
+    <div class="card" style="grid-column: span 3;">
+      <h3>إجمالي المستخدمين</h3>
+      <div style="font-size:28px; font-weight:900">{{ stats.users_total }}</div>
+      <div class="muted" style="font-weight:800">كل الحسابات</div>
+    </div>
+    <div class="card" style="grid-column: span 3;">
+      <h3>مستخدمون نشطون</h3>
+      <div style="font-size:28px; font-weight:900">{{ stats.users_active }}</div>
+      <div class="muted" style="font-weight:800">is_active = True</div>
+    </div>
+    <div class="card" style="grid-column: span 3;">
+      <h3>ممثلو الجهات</h3>
+      <div style="font-size:28px; font-weight:900">{{ stats.org_reps }}</div>
+      <div class="muted" style="font-weight:800">ORG_REP</div>
+    </div>
+    <div class="card" style="grid-column: span 3;">
+      <h3>المدربون</h3>
+      <div style="font-size:28px; font-weight:900">{{ stats.trainers }}</div>
+      <div class="muted" style="font-weight:800">TRAINER</div>
+    </div>
+
+    <div class="card" style="grid-column: span 12;">
+      <h3>آخر سجلات التدقيق</h3>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>التاريخ</th>
+              <th>الإجراء</th>
+              <th>المنفذ</th>
+              <th>المستهدف</th>
+              <th>IP</th>
+              <th>ملاحظة</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for log in recent_audit %}
+            <tr>
+              <td>{{ log.created_at|date:"Y-m-d H:i" }}</td>
+              <td><span class="badge">{{ log.get_action_display }}</span></td>
+              <td>{{ log.actor.email|default:"-" }}</td>
+              <td>{{ log.target_user.email|default:"-" }}</td>
+              <td>{{ log.ip_address|default:"-" }}</td>
+              <td class="muted" style="font-weight:800">{{ log.note|default:"-" }}</td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="6" class="muted" style="font-weight:800">لا توجد سجلات بعد.</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+{% endblock %}

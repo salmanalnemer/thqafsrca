@@ -1,0 +1,66 @@
+{% extends "sysadmin_temp/_layout.html" %}
+{% block title %}لوحة مدير النظام - المستخدمون{% endblock %}
+{% block header_title %}المستخدمون{% endblock %}
+
+{% block content %}
+  <div class="card">
+    <h3>بحث وتصفية</h3>
+    <form method="get" class="form-row">
+      <div class="field" style="grid-column: span 5;">
+        <label>{{ form.q.label }}</label>
+        {{ form.q }}
+      </div>
+      <div class="field" style="grid-column: span 3;">
+        <label>{{ form.role.label }}</label>
+        {{ form.role }}
+      </div>
+      <div class="field" style="grid-column: span 3;">
+        <label>{{ form.region.label }}</label>
+        {{ form.region }}
+      </div>
+      <div class="field" style="grid-column: span 1; display:flex; align-items:end;">
+        <button class="btn" type="submit" style="width:100%">تطبيق</button>
+      </div>
+    </form>
+  </div>
+
+  <div class="card" style="margin-top:14px;">
+    <h3>قائمة المستخدمين (آخر 200)</h3>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>الاسم</th>
+            <th>البريد</th>
+            <th>الدور</th>
+            <th>المنطقة</th>
+            <th>فرع الجهة</th>
+            <th>الحالة</th>
+            <th>إجراء</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for u in users %}
+          <tr>
+            <td style="font-weight:900">{{ u.get_full_name|default:"-" }}</td>
+            <td class="muted" style="font-weight:800">{{ u.email }}</td>
+            <td><span class="badge">{{ u.get_role_display }}</span></td>
+            <td class="muted" style="font-weight:800">{{ u.region.name|default:"-" }}</td>
+            <td class="muted" style="font-weight:800">{{ u.org_branch.name|default:"-" }}</td>
+            <td>
+              {% if u.is_active %}
+                <span class="badge ok">نشط</span>
+              {% else %}
+                <span class="badge no">موقوف</span>
+              {% endif %}
+            </td>
+            <td><a class="btn" href="{% url 'sysadmin:user_edit' u.id %}">تعديل</a></td>
+          </tr>
+          {% empty %}
+          <tr><td colspan="7" class="muted" style="font-weight:800">لا يوجد نتائج.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+{% endblock %}

@@ -21,7 +21,8 @@ urlpatterns = [
     path("support/", include("support.urls")),
     path("contact/", include("contact.urls")),
     path("staff/", include("staff.urls")),
-    path("trainers/", include("trainers.urls")),
+    path("sansadmin/", include("sysadmin.urls")), # لوحة تحكم مدير النظام بإسم خاص 
+    path("trainers/", include("trainers.urls")), 
 ]
 
 # ✅ تفعيل خدمة ملفات static/media أثناء التطوير فقط (DEBUG=True)

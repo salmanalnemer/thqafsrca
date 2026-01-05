@@ -1,0 +1,60 @@
+{% extends "sysadmin_temp/_layout.html" %}
+{% block title %}لوحة مدير النظام - تعديل مستخدم{% endblock %}
+{% block header_title %}تعديل مستخدم{% endblock %}
+
+{% block content %}
+  <div class="grid">
+    <div class="card" style="grid-column: span 12;">
+      <h3>بيانات المستخدم</h3>
+      <div class="muted" style="font-weight:800; margin-bottom:10px">
+        البريد: <strong>{{ u.email }}</strong> — رقم: <strong>#{{ u.id }}</strong>
+      </div>
+
+      <form method="post">
+        {% csrf_token %}
+        <div class="form-row">
+          <div class="field" style="grid-column: span 3;">
+            <label>الاسم الأول</label>
+            {{ form.first_name }}
+          </div>
+          <div class="field" style="grid-column: span 3;">
+            <label>اسم العائلة</label>
+            {{ form.last_name }}
+          </div>
+          <div class="field" style="grid-column: span 3;">
+            <label>رقم الجوال</label>
+            {{ form.phone }}
+          </div>
+          <div class="field" style="grid-column: span 3;">
+            <label>الدور</label>
+            {{ form.role }}
+          </div>
+
+          <div class="field" style="grid-column: span 4;">
+            <label>المنطقة</label>
+            {{ form.region }}
+          </div>
+          <div class="field" style="grid-column: span 4;">
+            <label>فرع الجهة</label>
+            {{ form.org_branch }}
+          </div>
+          <div class="field" style="grid-column: span 4;">
+            <label>الحالة</label>
+            {{ form.is_active }}
+          </div>
+        </div>
+
+        {% if form.non_field_errors %}
+          <div class="msg error" style="margin-top:12px">
+            {{ form.non_field_errors }}
+          </div>
+        {% endif %}
+
+        <div class="actions">
+          <button class="btn" type="submit">حفظ</button>
+          <a class="btn" href="{% url 'sysadmin:users_list' %}">رجوع</a>
+        </div>
+      </form>
+    </div>
+  </div>
+{% endblock %}

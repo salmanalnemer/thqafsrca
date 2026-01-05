@@ -66,6 +66,7 @@ INSTALLED_APPS = [
     "support",
     "contact",
     "staff",
+    "sysadmin",
 ]
 
 AUTH_USER_MODEL = "accounts.User"

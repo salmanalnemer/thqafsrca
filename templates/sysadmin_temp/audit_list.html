@@ -1,0 +1,37 @@
+{% extends "sysadmin_temp/_layout.html" %}
+{% block title %}لوحة مدير النظام - سجل التدقيق{% endblock %}
+{% block header_title %}سجل التدقيق{% endblock %}
+
+{% block content %}
+  <div class="card">
+    <h3>آخر 250 سجل</h3>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>التاريخ</th>
+            <th>الإجراء</th>
+            <th>المنفذ</th>
+            <th>المستهدف</th>
+            <th>IP</th>
+            <th>ملاحظة</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for log in logs %}
+          <tr>
+            <td>{{ log.created_at|date:"Y-m-d H:i" }}</td>
+            <td><span class="badge">{{ log.get_action_display }}</span></td>
+            <td class="muted" style="font-weight:800">{{ log.actor.email|default:"-" }}</td>
+            <td class="muted" style="font-weight:800">{{ log.target_user.email|default:"-" }}</td>
+            <td class="muted" style="font-weight:800">{{ log.ip_address|default:"-" }}</td>
+            <td class="muted" style="font-weight:800">{{ log.note|default:"-" }}</td>
+          </tr>
+          {% empty %}
+          <tr><td colspan="6" class="muted" style="font-weight:800">لا توجد سجلات.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+{% endblock %}

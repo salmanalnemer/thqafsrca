@@ -1,0 +1,253 @@
+{% load static %}
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>{% block title %}لوحة مدير النظام - ثقف{% endblock %}</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+
+  <style>
+    :root{
+      --sr-red:#B71C1C; --sr-red-dark:#8e1414;
+      --ink:#0f172a; --muted:#475569;
+      --line:#e5e7eb; --soft:#f6f7f9;
+      --card:#ffffff; --shadow:0 10px 24px rgba(0,0,0,.10);
+      --radius:16px; --success:#16a34a; --warn:#f59e0b; --danger:#dc2626;
+      --sidebar-w: 280px;
+    }
+    *{ box-sizing:border-box; }
+    body{
+      margin:0;
+      font-family:"Tajawal",system-ui,-apple-system,Segoe UI,Roboto,Arial;
+      background: radial-gradient(1200px 600px at 20% 0%, rgba(183,28,28,.10), transparent 60%),
+                  radial-gradient(900px 500px at 80% 10%, rgba(15,23,42,.06), transparent 55%),
+                  var(--soft);
+      color:var(--ink);
+    }
+    a{ color:inherit; text-decoration:none; }
+    .wrap{ display:flex; min-height:100vh; }
+    /* Sidebar */
+    .sidebar{
+      width:var(--sidebar-w);
+      position:sticky; top:0;
+      height:100vh;
+      padding:18px 14px;
+      background: linear-gradient(180deg, #ffffff, #fbfbfd);
+      border-left:1px solid var(--line);
+      box-shadow: 0 10px 30px rgba(15,23,42,.06);
+    }
+    .brand{
+      display:flex; align-items:center; gap:10px;
+      padding:10px 12px; border-radius:14px;
+      background: linear-gradient(90deg, rgba(183,28,28,.12), rgba(183,28,28,.04));
+      border:1px solid rgba(183,28,28,.18);
+      margin-bottom:14px;
+    }
+    .logo{
+      width:42px; height:42px; border-radius:14px;
+      display:grid; place-items:center;
+      background: linear-gradient(135deg, var(--sr-red), var(--sr-red-dark));
+      color:#fff; font-weight:900;
+      box-shadow: 0 10px 18px rgba(183,28,28,.25);
+    }
+    .brand h1{ font-size:15px; margin:0; font-weight:900; letter-spacing:.2px; }
+    .brand p{ margin:2px 0 0; font-size:12px; color:var(--muted); }
+    .nav{ display:flex; flex-direction:column; gap:8px; margin-top:10px; }
+    .nav a{
+      display:flex; align-items:center; justify-content:space-between;
+      padding:10px 12px;
+      border-radius:14px;
+      border:1px solid transparent;
+      background: transparent;
+      color:var(--ink);
+      transition: .15s ease;
+    }
+    .nav a .lbl{ font-weight:800; font-size:13px; }
+    .nav a .tag{
+      font-size:11px; color:var(--muted);
+      background: #fff;
+      border:1px solid var(--line);
+      padding:3px 8px; border-radius:999px;
+    }
+    .nav a:hover{
+      background:#fff;
+      border-color: var(--line);
+      box-shadow: 0 12px 22px rgba(15,23,42,.06);
+      transform: translateY(-1px);
+    }
+    .nav a.active{
+      background: linear-gradient(90deg, rgba(183,28,28,.14), rgba(183,28,28,.06));
+      border-color: rgba(183,28,28,.22);
+    }
+
+    /* Main */
+    .main{ flex:1; padding:18px; }
+    .topbar{
+      position:sticky; top:0; z-index:40;
+      display:flex; align-items:center; justify-content:space-between;
+      padding:12px 14px;
+      border-radius:18px;
+      background: rgba(255,255,255,.85);
+      border:1px solid var(--line);
+      backdrop-filter: blur(10px);
+      box-shadow: 0 10px 24px rgba(15,23,42,.06);
+      margin-bottom:14px;
+    }
+    .topbar .ttl{ font-weight:900; font-size:14px; }
+    .topbar .meta{
+      display:flex; gap:10px; align-items:center;
+      color:var(--muted); font-size:12px; font-weight:700;
+    }
+    .pill{
+      display:inline-flex; align-items:center; gap:6px;
+      padding:6px 10px; border-radius:999px;
+      border:1px solid var(--line);
+      background:#fff;
+    }
+    .btn{
+      display:inline-flex; align-items:center; justify-content:center;
+      padding:9px 12px; border-radius:12px;
+      border:1px solid var(--line);
+      background:#fff;
+      font-weight:900; font-size:12px;
+      cursor:pointer;
+    }
+    .btn.danger{
+      border-color: rgba(220,38,38,.25);
+      background: rgba(220,38,38,.06);
+    }
+
+    /* Cards / grid */
+    .grid{ display:grid; grid-template-columns: repeat(12, 1fr); gap:14px; }
+    .card{
+      background: rgba(255,255,255,.92);
+      border:1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding:14px;
+    }
+    .card h3{ margin:0 0 8px; font-size:13px; font-weight:900; }
+    .muted{ color:var(--muted); }
+
+    /* Tables */
+    .table-wrap{ overflow:auto; border-radius:16px; border:1px solid var(--line); background:#fff; }
+    table{ width:100%; border-collapse:collapse; min-width: 900px; }
+    th, td{ padding:10px 12px; border-bottom:1px solid var(--line); text-align:right; font-size:13px; }
+    th{ background:#fafafa; font-weight:900; color:var(--ink); position:sticky; top:0; z-index:1; }
+    tr:hover td{ background: rgba(183,28,28,.03); }
+    .badge{
+      display:inline-flex; align-items:center;
+      padding:4px 8px; border-radius:999px; font-size:11px; font-weight:900;
+      border:1px solid var(--line); background:#fff; color:var(--muted);
+      white-space:nowrap;
+    }
+    .badge.ok{ background: rgba(22,163,74,.08); border-color: rgba(22,163,74,.25); color: #166534; }
+    .badge.no{ background: rgba(220,38,38,.07); border-color: rgba(220,38,38,.22); color:#7f1d1d; }
+
+    /* Forms */
+    .form-row{ display:grid; grid-template-columns: repeat(12, 1fr); gap:12px; }
+    .field{ grid-column: span 4; }
+    .field label{ display:block; font-weight:900; font-size:12px; margin-bottom:6px; }
+    .field input, .field select{
+      width:100%;
+      border:1px solid var(--line);
+      border-radius:12px;
+      padding:10px 12px;
+      background:#fff;
+      outline:none;
+      font-family:inherit;
+      font-weight:700;
+    }
+    .field input:focus, .field select:focus{
+      border-color: rgba(183,28,28,.35);
+      box-shadow: 0 0 0 4px rgba(183,28,28,.10);
+    }
+    .actions{ display:flex; gap:10px; justify-content:flex-start; margin-top:12px; }
+
+    /* Messages */
+    .msgs{ display:flex; flex-direction:column; gap:8px; margin: 10px 0 14px; }
+    .msg{
+      border-radius:14px;
+      padding:10px 12px;
+      border:1px solid var(--line);
+      background:#fff;
+      font-weight:800; font-size:12px;
+    }
+    .msg.success{ border-color: rgba(22,163,74,.25); background: rgba(22,163,74,.06); }
+    .msg.error{ border-color: rgba(220,38,38,.25); background: rgba(220,38,38,.06); }
+    .msg.warning{ border-color: rgba(245,158,11,.25); background: rgba(245,158,11,.08); }
+
+    @media (max-width: 980px){
+      .wrap{ flex-direction:column; }
+      .sidebar{ width:auto; height:auto; position:relative; border-left:none; border-bottom:1px solid var(--line); }
+      .main{ padding:12px; }
+      .field{ grid-column: span 12; }
+      table{ min-width: 700px; }
+    }
+  </style>
+  {% block extra_head %}{% endblock %}
+</head>
+<body>
+  <div class="wrap">
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="logo">ث</div>
+        <div>
+          <h1>لوحة مدير النظام</h1>
+          <p>إدارة المستخدمين والصلاحيات (مقيدة)</p>
+        </div>
+      </div>
+
+      <nav class="nav">
+        <a href="{% url 'sysadmin:dashboard' %}" class="{% if active == 'dashboard' %}active{% endif %}">
+          <span class="lbl">الرئيسية</span><span class="tag">Dashboard</span>
+        </a>
+        <a href="{% url 'sysadmin:users_list' %}" class="{% if active == 'users' %}active{% endif %}">
+          <span class="lbl">المستخدمون</span><span class="tag">Users</span>
+        </a>
+        <a href="{% url 'sysadmin:audit_list' %}" class="{% if active == 'audit' %}active{% endif %}">
+          <span class="lbl">سجل التدقيق</span><span class="tag">Audit</span>
+        </a>
+        <a href="{% url 'home' %}">
+          <span class="lbl">العودة للمنصة</span><span class="tag">Home</span>
+        </a>
+      </nav>
+
+      <div class="card" style="margin-top:14px">
+        <h3>تنبيه أمني</h3>
+        <div class="muted" style="font-size:12px; font-weight:800; line-height:1.8">
+          أي تعديل هنا يتم تسجيله تلقائياً في سجل التدقيق.
+        </div>
+      </div>
+    </aside>
+
+    <main class="main">
+      <div class="topbar">
+        <div class="ttl">{% block header_title %}لوحة مدير النظام{% endblock %}</div>
+        <div class="meta">
+          <span class="pill">الحساب: <strong style="margin-right:6px">{{ request.user.get_full_name|default:request.user.email }}</strong></span>
+          <form method="post" action="{% url 'accounts:logout' %}" style="display:inline;">
+  {% csrf_token %}
+  <button type="submit" class="btn btn-link" style="all:unset;cursor:pointer;">
+    تسجيل الخروج
+  </button>
+</form>
+
+        </div>
+      </div>
+
+      {% if messages %}
+      <div class="msgs">
+        {% for message in messages %}
+          <div class="msg {% if message.tags %}{{ message.tags }}{% endif %}">{{ message }}</div>
+        {% endfor %}
+      </div>
+      {% endif %}
+
+      {% block content %}{% endblock %}
+    </main>
+  </div>
+</body>
+</html>
