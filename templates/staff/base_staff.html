@@ -1,0 +1,330 @@
+{% load static %}
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>{% block title %}لوحة المسؤولين - ثقف{% endblock %}</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;600;700;800&display=swap" rel="stylesheet">
+
+  <style>
+    :root{
+      --sr-red:#B71C1C; --sr-red-dark:#8e1414;
+      --ink:#0f172a; --muted:#475569;
+      --line:#e5e7eb; --soft:#f6f7f9;
+      --card:#ffffff; --shadow:0 10px 24px rgba(0,0,0,.10);
+      --radius:16px; --success:#16a34a;
+    }
+    *{ box-sizing:border-box; }
+    body{ margin:0; font-family:"Tajawal",system-ui,-apple-system,Segoe UI,Roboto,Arial; color:var(--ink); background:#f7f7fb; }
+
+    /* TOPBAR */
+    .topbar{ background:#fff; border-bottom:1px solid var(--line); position:sticky; top:0; z-index:20; }
+    .topbar .inner{ padding:12px 16px; display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; }
+
+    .brand{ display:flex; align-items:center; gap:10px; font-weight:800; text-decoration:none; color:inherit; }
+    .brand-logo-small{ width:100px; height:auto; object-fit:contain; display:block; }
+    .badge{ background:linear-gradient(90deg,var(--sr-red),var(--sr-red-dark)); color:#fff; padding:6px 10px; border-radius:999px; font-size:12px; white-space:nowrap; }
+    .pill{ background:#0f0d41; border:1px solid #0f0d41; padding:6px 10px; border-radius:999px; color:#ffffff; font-size:12px; white-space:nowrap; font-weight:800; }
+
+    /* LAYOUT */
+    .shell{ display:grid; grid-template-columns: 290px 1fr; min-height:calc(100vh - 58px); }
+    @media (max-width: 980px){ .shell{ grid-template-columns: 1fr; } }
+
+    /* SIDEBAR */
+    .sidebar{ background:#fff; border-left:1px solid var(--line); padding:14px; }
+    @media (max-width: 980px){ .sidebar{ border-left:none; border-bottom:1px solid var(--line); } }
+
+    .side-head{
+      border:1px solid var(--line);
+      border-radius:16px;
+      padding:12px;
+      background:linear-gradient(180deg,#fff,#fbfaf7);
+      box-shadow:0 10px 22px rgba(0,0,0,.06);
+    }
+    .side-title{ font-weight:900; margin:0 0 6px; }
+    .side-sub{ margin:0; color:var(--muted); font-weight:700; line-height:1.8; font-size:13px; }
+
+    .nav{ display:flex; flex-direction:column; gap:8px; margin-top:12px; }
+
+    /* نفس روابط الجهات */
+    .nav a, .dd-head{
+      text-decoration:none; color:var(--ink);
+      border:1px solid var(--line);
+      border-radius:14px;
+      padding:10px 12px;
+      display:flex; align-items:center; justify-content:space-between;
+      background:#fff; font-weight:800;
+      width:100%;
+      cursor:pointer;
+      font-family:"Tajawal",system-ui,-apple-system,Segoe UI,Roboto,Arial;
+      font-size:13px;
+      line-height:1.4;
+    }
+    .nav a.active, .dd-head.active{
+      background:linear-gradient(90deg, rgba(183,28,28,.12), rgba(142,20,20,.06));
+      border-color:rgba(183,28,28,.25);
+    }
+    .nav small{ color:var(--muted); font-weight:700; font-size:11px; }
+
+    /* Dropdown (بنفس روح السايدبار) */
+    .dd{ margin:0; padding:0; border:0; background:transparent; }
+    .chev{
+      width:26px; height:26px; border-radius:10px;
+      display:grid; place-items:center;
+      border:1px solid var(--line);
+      background:#fff;
+      color:var(--muted);
+      font-size:14px;
+      line-height:1;
+      transition:transform .2s ease;
+      flex:0 0 auto;
+    }
+    .dd.open .chev{ transform: rotate(180deg); }
+
+    .dd-body{
+      display:none;
+      padding-right:10px;
+      margin-top:8px;
+    }
+    .dd.open .dd-body{ display:block; }
+
+    .subitem{
+      display:flex; align-items:center; justify-content:space-between; gap:10px;
+      border:1px solid var(--line);
+      border-radius:14px;
+      padding:9px 10px;
+      background:#fff;
+      text-decoration:none;
+      color:var(--ink);
+      font-weight:800;
+      font-family:"Tajawal",system-ui,-apple-system,Segoe UI,Roboto,Arial;
+      font-size:13px;
+      line-height:1.4;
+      margin-top:6px;
+    }
+    .subitem.active{
+      background:linear-gradient(90deg, rgba(183,28,28,.12), rgba(142,20,20,.06));
+      border-color:rgba(183,28,28,.25);
+      color:var(--sr-red);
+    }
+    .subleft{ display:flex; align-items:center; gap:9px; }
+    .dot{ width:9px; height:9px; border-radius:50%; background:var(--sr-red); opacity:.65; flex:0 0 auto; }
+
+    /* CONTENT */
+    .content{ padding:18px; }
+    .wrap{ max-width:1100px; }
+    .grid{ display:grid; grid-template-columns:repeat(12,1fr); gap:12px; }
+    .card{
+      grid-column:span 12;
+      background:var(--card);
+      border:1px solid var(--line);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      padding:16px;
+    }
+    .card.half{ grid-column:span 6; }
+    @media (max-width:980px){ .card.half{ grid-column:span 12; } }
+
+    h1{ margin:0 0 10px; font-size:20px; }
+    h2{ margin:0 0 10px; font-size:16px; }
+    p{ margin:0; color:var(--muted); line-height:1.9; font-weight:700; }
+
+    .btn{ cursor:pointer; display:inline-flex; align-items:center; justify-content:center; gap:8px; padding:10px 12px; border-radius:12px; border:1px solid var(--line); background:#fff; font-weight:900; font-family:"Tajawal",system-ui,-apple-system,Segoe UI,Roboto,Arial; }
+    .btn--red{ background:linear-gradient(90deg,var(--sr-red),var(--sr-red-dark)); border-color:transparent; color:#fff; }
+
+    /* FOOTER */
+    .footer{ margin-top:14px; padding:12px 16px; color:#fff; background:linear-gradient(90deg,var(--sr-red),var(--sr-red-dark)); }
+
+    /* TOAST */
+    .toast{
+      position:fixed;
+      bottom:18px;
+      right:18px;
+      background:#fff;
+      border:1px solid #dcfce7;
+      border-right:6px solid var(--success);
+      border-radius:14px;
+      box-shadow:0 14px 40px rgba(0,0,0,.18);
+      padding:14px 16px;
+      min-width:280px;
+      z-index:9999;
+      display:none;
+      animation:slideUp .35s ease forwards;
+    }
+    .toast.show{ display:block; }
+    .toast-title{ font-weight:900; margin-bottom:4px; color:#065f46; }
+    .toast-msg{ font-size:14px; color:#14532d; font-weight:800; line-height:1.8; }
+    @keyframes slideUp{ from{ transform:translateY(20px); opacity:0; } to{ transform:translateY(0); opacity:1; } }
+  </style>
+
+  {% block extra_head %}{% endblock %}
+</head>
+
+<body>
+
+<header class="topbar">
+  <div class="inner">
+    <a href="{% url 'home' %}" class="brand" aria-label="العودة للرئيسية">
+      <img src="{% static 'assets/img/logothqaf.png' %}" alt="ثقّف" class="brand-logo-small">
+      <span class="badge">لوحة المسؤولين</span>
+    </a>
+
+    <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+      {% if region %}<span class="pill">المنطقة: {{ region }}</span>{% endif %}
+
+      {# ✅ الاسم الكامل فقط (بدون إيميل نهائياً) #}
+      {% if display_name %}
+        <span class="pill">مرحباً، {{ display_name }}</span>
+      {% else %}
+        <span class="pill">مرحباً</span>
+      {% endif %}
+
+      <form method="post" action="{% url 'accounts:logout' %}" style="margin:0;">
+        {% csrf_token %}
+        <button class="btn btn--red" type="submit">تسجيل خروج</button>
+      </form>
+    </div>
+  </div>
+</header>
+
+<div class="shell">
+  <aside class="sidebar">
+
+    <div class="side-head">
+      <div class="side-title">لوحة المسؤولين</div>
+      <p class="side-sub">إدارة الدورات والجهات والأفراد والشهادات</p>
+    </div>
+
+    <nav class="nav">
+
+      <a href="{% url 'staff:dashboard' %}" class="{% if active == 'dashboard' %}active{% endif %}">
+        <span>الداشبورد</span>
+        <small>نظرة عامة</small>
+      </a>
+
+      {# ✅ Dropdown الدورات التدريبية #}
+      <div class="dd js-dd {% if active in 'course_open course_approve courses_opened courses_closed courses_mine' %}open{% endif %}">
+        <button type="button"
+                class="dd-head js-dd-btn {% if active in 'course_open course_approve courses_opened courses_closed courses_mine' %}active{% endif %}"
+                aria-expanded="{% if active in 'course_open course_approve courses_opened courses_closed courses_mine' %}true{% else %}false{% endif %}">
+          <span>الدورات التدريبية</span>
+          <span class="chev">⌄</span>
+        </button>
+
+        <div class="dd-body">
+          <a class="subitem {% if active == 'course_open' %}active{% endif %}" href="{% url 'staff:course_open' %}">
+            <span class="subleft"><span class="dot"></span><span>فتح دورة تدريبية</span></span>
+            <small>إنشاء</small>
+          </a>
+
+          <a class="subitem {% if active == 'course_approve' %}active{% endif %}" href="{% url 'staff:course_approve' %}">
+            <span class="subleft"><span class="dot"></span><span>اعتماد الدورات</span></span>
+            <small>مراجعة</small>
+          </a>
+
+          <a class="subitem {% if active == 'courses_opened' %}active{% endif %}" href="{% url 'staff:courses_opened' %}">
+            <span class="subleft"><span class="dot"></span><span>الدورات المفتوحة</span></span>
+            <small>عرض</small>
+          </a>
+
+          <a class="subitem {% if active == 'courses_closed' %}active{% endif %}" href="{% url 'staff:courses_closed' %}">
+            <span class="subleft"><span class="dot"></span><span>الدورات المغلقة</span></span>
+            <small>أرشيف</small>
+          </a>
+
+          <a class="subitem {% if active == 'courses_mine' %}active{% endif %}" href="{% url 'staff:courses_mine' %}">
+            <span class="subleft"><span class="dot"></span><span>دوراتي</span></span>
+            <small>خاصة</small>
+          </a>
+        </div>
+      </div>
+
+      <a href="#" onclick="return false;">
+        <span>الجهات</span>
+        <small>إدارة</small>
+      </a>
+
+      <a href="#" onclick="return false;">
+        <span>الأفراد</span>
+        <small>إدارة</small>
+      </a>
+
+      <a href="#" onclick="return false;">
+        <span>الشهادات</span>
+        <small>إدارة</small>
+      </a>
+
+    </nav>
+
+    <div class="muted" style="margin-top:14px; font-size:12px; line-height:1.8;">
+      * ملاحظة: سيتم ربط البيانات فعليًا عند اكتمال تطبيقات
+      <b>courses</b> و <b>certificates</b> وربطها بصلاحيات المسؤول.
+    </div>
+  </aside>
+
+  <main class="content">
+    <div class="wrap">
+      {% block content %}{% endblock %}
+    </div>
+  </main>
+</div>
+
+<footer class="footer">
+  <div style="max-width:1100px; margin:0 auto; display:flex; justify-content:space-between; gap:10px; flex-wrap:wrap;">
+    <div>© {% now "Y" %} منصة ثقف</div>
+    <div>الدعم: support@thqaf.com</div>
+  </div>
+</footer>
+
+{% if request.session.show_login_toast %}
+  <div class="toast" id="loginToast">
+    <div class="toast-title">مرحباً بكم 🎉</div>
+    <div class="toast-msg">
+      تم تسجيل الدخول بنجاح.
+      {% if display_name %}<br>أهلاً <strong>{{ display_name }}</strong>{% endif %}
+    </div>
+  </div>
+{% endif %}
+
+<script>
+(function(){
+  // Dropdown
+  document.querySelectorAll(".js-dd").forEach((dd) => {
+    const btn = dd.querySelector(".js-dd-btn");
+    if(!btn) return;
+
+    const setAria = () => btn.setAttribute("aria-expanded", dd.classList.contains("open") ? "true" : "false");
+    setAria();
+
+    btn.addEventListener("click", () => {
+      dd.classList.toggle("open");
+      setAria();
+    });
+  });
+
+  // Toast
+  const toast = document.getElementById("loginToast");
+  if(!toast) return;
+
+  toast.classList.add("show");
+
+  setTimeout(function(){
+    toast.style.opacity="0";
+    toast.style.transition="opacity .4s ease";
+  }, 4200);
+
+  fetch("{% url 'accounts:welcome_clear' %}", {
+    method:"POST",
+    headers:{ "X-CSRFToken": (function(){
+      const v = `; ${document.cookie}`.split(`; csrftoken=`);
+      return v.length===2 ? v.pop().split(';').shift() : "";
+    })()},
+    credentials:"same-origin"
+  }).catch(()=>{});
+})();
+</script>
+
+</body>
+</html>

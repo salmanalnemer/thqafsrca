@@ -63,6 +63,7 @@ INSTALLED_APPS = [
     "certificates",
     "support",
     "contact",
+    "staff",
 ]
 
 AUTH_USER_MODEL = "accounts.User"

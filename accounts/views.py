@@ -31,6 +31,21 @@ OTP_TTL_MINUTES = 10
 OTP_MAX_ATTEMPTS = 6
 OTP_RESEND_COOLDOWN_SECONDS = 60
 
+# ✅ أدوار لوحة المسؤولين (عدّلها حسب مسمياتك الفعلية في UserRole)
+STAFF_ROLES = {
+    UserRole.SUPER_ADMIN,
+    UserRole.REGION_MANAGER,
+    UserRole.SUPERVISOR,
+    UserRole.COORDINATOR,
+}
+
+# ✅ الأدوار المسموح لها باستخدام بوابة الدخول العامة (نفس الهوم)
+ALLOWED_PORTAL_ROLES = {
+    UserRole.INDIVIDUAL,
+    UserRole.ORG_REP,
+    *STAFF_ROLES,
+}
+
 
 # -----------------------------
 # Helpers
@@ -53,7 +68,6 @@ def _clean_and_validate_email(raw: str) -> str:
     if not email:
         raise ValueError("Email is empty.")
 
-    # Reject non-ASCII (prevents: local-part contains non-ASCII characters)
     try:
         email.encode("ascii")
     except UnicodeEncodeError as exc:
@@ -68,7 +82,6 @@ def _clean_and_validate_email(raw: str) -> str:
 
 
 def os_getenv(k: str) -> str:
-    # helper بدون import os أعلى الملف (لتقليل التغييرات)
     try:
         import os
         return (os.getenv(k, "") or "").strip()
@@ -77,7 +90,6 @@ def os_getenv(k: str) -> str:
 
 
 def _no_reply_email() -> str:
-    # no-reply@thqaf.com (المطلوب)
     return (
         (getattr(settings, "THQAF_NO_REPLY_EMAIL", "") or "").strip()
         or os_getenv("THQAF_NO_REPLY_EMAIL")
@@ -86,7 +98,6 @@ def _no_reply_email() -> str:
 
 
 def _support_email() -> str:
-    # support@thqaf.com (المطلوب)
     return (
         (getattr(settings, "THQAF_SUPPORT_EMAIL", "") or "").strip()
         or os_getenv("THQAF_SUPPORT_EMAIL")
@@ -112,7 +123,6 @@ def _send_html_email(
     إرسال رسالة HTML + TXT بشكل آمن (مع تحقق بريد المستلم).
     """
     to_email = _clean_and_validate_email(to_email)
-
     text_body = render_to_string(txt_template, ctx)
 
     html_body = None
@@ -139,12 +149,37 @@ def _send_html_email(
 
 
 # -----------------------------
+# Redirect by role (✅ من نفس الهوم)
+# -----------------------------
+def _redirect_by_role(request, user: User):
+    """
+    ✅ نفس صفحة الدخول للجميع، وبعد التحقق يتم التوجيه حسب الدور.
+    ملاحظة: يتطلب وجود staff app بمسار name='staff:dashboard'
+    """
+    role = getattr(user, "role", None)
+
+    if role in STAFF_ROLES:
+        return _safe_next(request, "staff:dashboard")
+
+    if role == UserRole.INDIVIDUAL:
+        return _safe_next(request, "individuals:dashboard")
+
+    if role == UserRole.ORG_REP:
+        return _safe_next(request, "organizations:dashboard")
+
+    # أي دور غير معروف/غير مسموح
+    try:
+        logout(request)
+    except Exception:
+        pass
+    messages.error(request, "غير مصرح لك بالدخول.")
+    return redirect("accounts:login")
+
+
+# -----------------------------
 # Emails (verification / login otp / course notification / contact)
 # -----------------------------
 def _send_verify_email_otp(email: str, code: str) -> None:
-    """
-    Email تفعيل الحساب (OTP) — من no-reply@thqaf.com
-    """
     subject = "تفعيل حسابك في منصة ثقف"
     ctx = {
         "otp_code": code,
@@ -167,9 +202,6 @@ def _send_verify_email_otp(email: str, code: str) -> None:
 
 
 def _send_login_otp_email(email: str, code: str) -> None:
-    """
-    OTP تسجيل الدخول — من no-reply@thqaf.com
-    """
     subject = "رمز التحقق لتسجيل الدخول - ثقف"
     ctx = {
         "otp_code": code,
@@ -196,12 +228,8 @@ def send_course_notification_email(
     to_email: str,
     course_title: str,
     start_at: str | None = None,
-    extra: str | None = None
+    extra: str | None = None,
 ) -> None:
-    """
-    إشعار الدورات التدريبية — من no-reply@thqaf.com
-    (تقدر تستدعيها من courses app)
-    """
     subject = f"إشعار دورة تدريبية: {course_title}"
     ctx = {
         "course_title": course_title,
@@ -224,10 +252,6 @@ def send_course_notification_email(
 
 
 def send_contact_us_email(*, from_name: str, from_email: str, message_text: str) -> None:
-    """
-    تواصل معنا — نرسل للدعم support@thqaf.com
-    عمليًا أفضل تسليم: from = no-reply (لضمان SMTP) + reply-to = بريد العميل
-    """
     from_email_clean = _clean_and_validate_email(from_email)
 
     subject = f"رسالة تواصل معنا - {from_name}"
@@ -575,7 +599,7 @@ def resend_otp_view(request):
 
 
 # -----------------------------
-# Login (✅ يسمح فقط فرد/جهة + OTP)
+# Login (✅ نفس بوابة الدخول: فرد/جهة/مسؤول + OTP)
 # -----------------------------
 @require_http_methods(["GET", "POST"])
 def login_view(request):
@@ -599,8 +623,9 @@ def login_view(request):
         messages.error(request, "حسابك غير مفعل. أدخل رمز التفعيل.")
         return redirect("accounts:verify_email")
 
-    if getattr(user, "role", None) not in (UserRole.INDIVIDUAL, UserRole.ORG_REP):
-        messages.error(request, "غير مصرح لك بالدخول. هذه البوابة مخصصة للأفراد والجهات فقط.")
+    # ✅ السماح أيضاً للمسؤولين (نفس الهوم)
+    if getattr(user, "role", None) not in ALLOWED_PORTAL_ROLES:
+        messages.error(request, "غير مصرح لك بالدخول.")
         return redirect("accounts:login")
 
     try:
@@ -680,7 +705,8 @@ def login_otp_view(request):
             messages.error(request, "الحساب غير موجود.")
             return redirect("accounts:login")
 
-        if getattr(user, "role", None) not in (UserRole.INDIVIDUAL, UserRole.ORG_REP):
+        # ✅ السماح أيضاً للمسؤولين
+        if getattr(user, "role", None) not in ALLOWED_PORTAL_ROLES:
             messages.error(request, "غير مصرح لك بالدخول.")
             return redirect("accounts:login")
 
@@ -689,7 +715,7 @@ def login_otp_view(request):
         display_name = _get_display_name(user)
         request.session["display_name"] = display_name
 
-        # ✅ Toast مرة واحدة بعد الدخول (للأفراد والجهات)
+        # ✅ Toast مرة واحدة بعد الدخول
         request.session["show_login_toast"] = True
 
         # (اختياري) مودال للأفراد فقط كما كان
@@ -702,14 +728,8 @@ def login_otp_view(request):
 
         messages.success(request, "تم تسجيل الدخول بنجاح.")
 
-        # ✅ توجيه حسب نوع الحساب
-        if getattr(user, "role", None) == UserRole.INDIVIDUAL:
-            return _safe_next(request, "individuals:dashboard")
-
-        if getattr(user, "role", None) == UserRole.ORG_REP:
-            return _safe_next(request, "organizations:dashboard")
-
-        return _safe_next(request, "home")
+        # ✅ توجيه حسب الدور (فرد/جهة/مسؤول)
+        return _redirect_by_role(request, user)
 
     except Exception as e:
         logger.exception("Login OTP verify failed: %s", e)
@@ -742,6 +762,11 @@ def resend_login_otp_view(request):
     user = User.objects.filter(pk=user_id, email=email).first()
     if not user:
         messages.error(request, "الحساب غير موجود.")
+        return redirect("accounts:login")
+
+    # ✅ لا نرسل OTP لأدوار غير مسموحة
+    if getattr(user, "role", None) not in ALLOWED_PORTAL_ROLES:
+        messages.error(request, "غير مصرح لك بالدخول.")
         return redirect("accounts:login")
 
     try:
@@ -780,7 +805,6 @@ def logout_view(request):
 # -----------------------------
 @require_POST
 def clear_welcome_view(request):
-    # كان يمسح المودال فقط، الآن يمسح المودال + التوست
     request.session.pop("show_welcome_modal", None)
     request.session.pop("welcome_name", None)
     request.session.pop("show_login_toast", None)
